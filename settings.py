@@ -11,6 +11,8 @@ class Settings(BaseSettings):
 
     valid_code: str
 
+    cdn: str
+
     telegram_bot_token: str
     api_base_url: str
 

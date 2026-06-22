@@ -74,6 +74,7 @@ async def read_films(
             "page": page,
             "total_pages": total_pages,
             "user_email": current_user.email if current_user else None,
+            "cdn": settings.cdn,
         },
     )
 
@@ -304,6 +305,7 @@ async def search_films(
             "page": page,
             "total_pages": total_pages,
             "user_email": current_user.email if current_user else None,
+            "cdn": settings.cdn
         },
     )
 
@@ -356,6 +358,7 @@ async def read_films_by_genre(
             "page": page,
             "total_pages": total_pages,
             "user_email": current_user.email if current_user else None,
+            "cdn": settings.cdn
         },
     )
 
@@ -410,6 +413,7 @@ async def read_films_by_country(
             "page": page,
             "total_pages": total_pages,
             "user_email": current_user.email if current_user else None,
+            "cdn": settings.cdn
         },
     )
 
@@ -452,6 +456,7 @@ async def read_films_by_year(
             "page": page,
             "total_pages": total_pages,
             "user_email": current_user.email if current_user else None,
+            "cdn": settings.cdn
         },
     )
 
@@ -477,6 +482,7 @@ async def read_film(
             "genres": genres_for_template,
             "page_title": page_title,
             "user_email": current_user.email if current_user else None,
+            "cdn": settings.cdn
         },
     )
 

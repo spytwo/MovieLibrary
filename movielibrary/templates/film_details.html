@@ -3,7 +3,7 @@ endblock %} {% block content %}
 <div class="film-details-main">
     <div class="film-card">
         <img
-            src="https://cdn.jsdelivr.net/gh/spaceoceanoutlook/static-assets@master/images/films/{{ film.photo }}"
+            src="{{ cdn }}{{ film.photo }}"
             alt="{{ film.title }}"
         />
         <div class="film-info">
