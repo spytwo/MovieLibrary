@@ -9,3 +9,9 @@ shell:
 
 app:
     docker exec -it movielibrary_app /bin/bash
+
+fix:
+    ruff format && ruff check --fix
+
+logs:
+    docker compose logs

@@ -1,18 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import desc, func, select
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from movielibrary.database import get_db
-from movielibrary.models import Film, FilmCountry, FilmGenre
 from movielibrary.schemas.film import FilmRead, FilmSearchResult
+from movielibrary.services.film import FilmService
 
 router = APIRouter()
-
-COMMON_FILM_OPTIONS = [
-    selectinload(Film.genres).selectinload(FilmGenre.genre),
-    selectinload(Film.countries).selectinload(FilmCountry.country),
-]
 
 
 @router.get(
@@ -22,10 +15,8 @@ COMMON_FILM_OPTIONS = [
     description="Возвращает список всех фильмов с жанрами и странами",
 )
 async def list_films(db: AsyncSession = Depends(get_db)):
-    stmt = select(Film).options(*COMMON_FILM_OPTIONS).order_by(desc(Film.id))
-    result = await db.execute(stmt)
-    films = result.unique().scalars().all()
-    return films
+    service = FilmService(db)
+    return await service.get_films_list()
 
 
 @router.get(
@@ -38,10 +29,8 @@ async def search_films(
     q: str = Query(..., min_length=3, description="Название фильма"),
     db: AsyncSession = Depends(get_db),
 ):
-    stmt = select(Film).filter(Film.title.ilike(f"%{q}%"))
-    result = await db.execute(stmt)
-    films = result.scalars().all()
-    return films
+    service = FilmService(db)
+    return await service.search_films_by_title(q)
 
 
 @router.get(
@@ -51,13 +40,8 @@ async def search_films(
     description="Показывает общую информацию о библиотеке фильмов",
 )
 async def get_films_statistics(db: AsyncSession = Depends(get_db)):
-    result_count = await db.execute(select(func.count(Film.id)))
-    films_count = result_count.scalar() or 0
-
-    result_avg = await db.execute(select(func.avg(Film.rating)))
-    average_rating = result_avg.scalar() or 0.0
-
-    return {"total_films": films_count, "average_rating": round(average_rating, 2)}
+    service = FilmService(db)
+    return await service.get_statistics()
 
 
 @router.get(
@@ -67,9 +51,5 @@ async def get_films_statistics(db: AsyncSession = Depends(get_db)):
     description="Возвращает подробную информацию о фильме по его ID, включая жанры и страны",
 )
 async def retrieve_film(film_id: int, db: AsyncSession = Depends(get_db)):
-    stmt = select(Film).options(*COMMON_FILM_OPTIONS).filter(Film.id == film_id)
-    result = await db.execute(stmt)
-    film = result.unique().scalars().first()
-    if not film:
-        raise HTTPException(status_code=404, detail="Фильм не найден")
-    return film
+    service = FilmService(db)
+    return await service.get_film_by_id(film_id)

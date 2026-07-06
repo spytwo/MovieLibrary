@@ -14,9 +14,7 @@ from fastapi import (
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import ValidationError
-from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from movielibrary.auth_utils import (
     create_access_token,
@@ -27,27 +25,19 @@ from movielibrary.auth_utils import (
     verify_password,
 )
 from movielibrary.database import get_db
-from movielibrary.models import Country, Film, FilmCountry, FilmGenre, Genre, User
+from movielibrary.models import User
 from movielibrary.models.enums import MediaType
 from movielibrary.schemas.film import FilmCreate, FilmRead
 from movielibrary.schemas.user import UserCreate
 from movielibrary.send_email import send_email_async
+from movielibrary.services.film import FilmService
+from movielibrary.services.filter import FilterService
 from settings import settings
 
 router = APIRouter()
 templates = Jinja2Templates(directory="movielibrary/templates")
 
-COMMON_FILM_OPTIONS = [
-    selectinload(Film.genres).selectinload(FilmGenre.genre),
-    selectinload(Film.countries).selectinload(FilmCountry.country),
-]
-
 MINUTE_IN_SECONDS = 60
-
-
-async def get_all_genres(db: AsyncSession):
-    result = await db.execute(select(Genre))
-    return result.scalars().all()
 
 
 @router.get("/", response_class=HTMLResponse, summary="Read Films")
@@ -56,23 +46,20 @@ async def read_films(
     db: AsyncSession = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional),
 ):
-    stmt = select(Film).options(*COMMON_FILM_OPTIONS).order_by(desc(Film.id)).limit(5)
-    result = await db.execute(stmt)
-    films = result.scalars().all()
-    films_for_template = [FilmRead.model_validate(film) for film in films]
-    genres_for_template = await get_all_genres(db)
+    film_service = FilmService(db)
+    filter_service = FilterService(db)
 
-    page = 1
-    total_pages = 1
+    films = await film_service.get_latest_films_for_index(limit=5)
+    genres_for_template = await filter_service.genre_repo.get_all()
 
     return templates.TemplateResponse(
         "index.html",
         {
             "request": request,
-            "films": films_for_template,
+            "films": [FilmRead.model_validate(film) for film in films],
             "genres": genres_for_template,
-            "page": page,
-            "total_pages": total_pages,
+            "page": 1,
+            "total_pages": 1,
             "user_email": current_user.email if current_user else None,
             "cdn": settings.cdn,
         },
@@ -226,31 +213,17 @@ async def list_series(
     page_size: int = 5,
     current_user: Optional[User] = Depends(get_current_user_optional),
 ):
-    total_stmt = select(func.count()).select_from(Film).filter(Film.type == "series")
-    total_result = await db.execute(total_stmt)
-    total_films = total_result.scalar()
+    film_service = FilmService(db)
+    filter_service = FilterService(db)
 
-    stmt = (
-        select(Film)
-        .options(*COMMON_FILM_OPTIONS)
-        .filter(Film.type == "series")
-        .order_by(desc(Film.id))
-        .limit(page_size)
-        .offset((page - 1) * page_size)
-    )
-    result = await db.execute(stmt)
-    films = result.scalars().all()
-
-    genres_for_template = await get_all_genres(db)
-    films_for_template = [FilmRead.model_validate(film) for film in films]
-
-    total_pages = (total_films + page_size - 1) // page_size
+    films, total_pages = await film_service.get_paginated_series(page, page_size)
+    genres_for_template = await filter_service.genre_repo.get_all()
 
     return templates.TemplateResponse(
         "index.html",
         {
             "request": request,
-            "films": films_for_template,
+            "films": [FilmRead.model_validate(film) for film in films],
             "genres": genres_for_template,
             "page": page,
             "total_pages": total_pages,
@@ -268,44 +241,22 @@ async def search_films(
     page_size: int = 5,
     current_user: Optional[User] = Depends(get_current_user_optional),
 ):
-    if not q or len(q) < 3:
-        films_for_template = []
-        total_pages = 0
-    else:
-        total_stmt = (
-            select(func.count(Film.id.distinct()))
-            .select_from(Film)
-            .join(Film.genres)
-            .join(FilmGenre.genre)
-            .filter(Film.title.ilike(f"%{q}%"))
-        )
-        total_result = await db.execute(total_stmt)
-        total_films = total_result.scalar()
+    film_service = FilmService(db)
+    filter_service = FilterService(db)
 
-        stmt = (
-            select(Film)
-            .options(*COMMON_FILM_OPTIONS)
-            .filter(Film.title.ilike(f"%{q}%"))
-            .order_by(desc(Film.id))
-            .limit(page_size)
-            .offset((page - 1) * page_size)
-        )
-        result = await db.execute(stmt)
-        films = result.scalars().all()
-        films_for_template = [FilmRead.model_validate(film) for film in films]
-        total_pages = (total_films + page_size - 1) // page_size
+    films, total_pages = await film_service.get_paginated_search(q, page, page_size)
+    genres_for_template = await filter_service.genre_repo.get_all()
 
-    genres_for_template = await get_all_genres(db)
     return templates.TemplateResponse(
         "index.html",
         {
             "request": request,
-            "films": films_for_template,
+            "films": [FilmRead.model_validate(film) for film in films],
             "genres": genres_for_template,
             "page": page,
             "total_pages": total_pages,
             "user_email": current_user.email if current_user else None,
-            "cdn": settings.cdn
+            "cdn": settings.cdn,
         },
     )
 
@@ -321,44 +272,23 @@ async def read_films_by_genre(
     page_size: int = 5,
     current_user: Optional[User] = Depends(get_current_user_optional),
 ):
-    total_stmt = (
-        select(func.count(Film.id.distinct()))
-        .select_from(Film)
-        .join(Film.genres)
-        .join(FilmGenre.genre)
-        .filter(Genre.name == genre_name)
+    filter_service = FilterService(db)
+
+    films, total_pages = await filter_service.get_paginated_by_genre(
+        genre_name, page, page_size
     )
-    total_result = await db.execute(total_stmt)
-    total_films = total_result.scalar()
-
-    stmt = (
-        select(Film)
-        .options(*COMMON_FILM_OPTIONS)
-        .join(Film.genres)
-        .join(FilmGenre.genre)
-        .filter(Genre.name == genre_name)
-        .order_by(desc(Film.id))
-        .limit(page_size)
-        .offset((page - 1) * page_size)
-    )
-    result = await db.execute(stmt)
-    films = result.scalars().all()
-    films_for_template = [FilmRead.model_validate(film) for film in films]
-
-    genres_for_template = await get_all_genres(db)
-
-    total_pages = (total_films + page_size - 1) // page_size
+    genres_for_template = await filter_service.genre_repo.get_all()
 
     return templates.TemplateResponse(
         "index.html",
         {
             "request": request,
-            "films": films_for_template,
+            "films": [FilmRead.model_validate(film) for film in films],
             "genres": genres_for_template,
             "page": page,
             "total_pages": total_pages,
             "user_email": current_user.email if current_user else None,
-            "cdn": settings.cdn
+            "cdn": settings.cdn,
         },
     )
 
@@ -376,44 +306,23 @@ async def read_films_by_country(
     page_size: int = 5,
     current_user: Optional[User] = Depends(get_current_user_optional),
 ):
-    total_stmt = (
-        select(func.count(Film.id.distinct()))
-        .select_from(Film)
-        .join(Film.countries)
-        .join(FilmCountry.country)
-        .filter(Country.name == country_name)
+    filter_service = FilterService(db)
+
+    films, total_pages = await filter_service.get_paginated_by_country(
+        country_name, page, page_size
     )
-    total_result = await db.execute(total_stmt)
-    total_films = total_result.scalar()
-
-    stmt = (
-        select(Film)
-        .options(*COMMON_FILM_OPTIONS)
-        .join(Film.countries)
-        .join(FilmCountry.country)
-        .filter(Country.name == country_name)
-        .order_by(desc(Film.id))
-        .limit(page_size)
-        .offset((page - 1) * page_size)
-    )
-    result = await db.execute(stmt)
-    films = result.scalars().all()
-    films_for_template = [FilmRead.model_validate(film) for film in films]
-
-    genres_for_template = await get_all_genres(db)
-
-    total_pages = (total_films + page_size - 1) // page_size
+    genres_for_template = await filter_service.genre_repo.get_all()
 
     return templates.TemplateResponse(
         "index.html",
         {
             "request": request,
-            "films": films_for_template,
+            "films": [FilmRead.model_validate(film) for film in films],
             "genres": genres_for_template,
             "page": page,
             "total_pages": total_pages,
             "user_email": current_user.email if current_user else None,
-            "cdn": settings.cdn
+            "cdn": settings.cdn,
         },
     )
 
@@ -427,36 +336,23 @@ async def read_films_by_year(
     page_size: int = 5,
     current_user: Optional[User] = Depends(get_current_user_optional),
 ):
-    total_stmt = select(func.count()).select_from(Film).filter(Film.year == year)
-    total_result = await db.execute(total_stmt)
-    total_films = total_result.scalar()
+    filter_service = FilterService(db)
 
-    stmt = (
-        select(Film)
-        .options(*COMMON_FILM_OPTIONS)
-        .filter(Film.year == year)
-        .order_by(desc(Film.id))
-        .limit(page_size)
-        .offset((page - 1) * page_size)
+    films, total_pages = await filter_service.get_paginated_by_year(
+        year, page, page_size
     )
-    result = await db.execute(stmt)
-    films = result.scalars().all()
-    films_for_template = [FilmRead.model_validate(film) for film in films]
-
-    genres_for_template = await get_all_genres(db)
-
-    total_pages = (total_films + page_size - 1) // page_size
+    genres_for_template = await filter_service.genre_repo.get_all()
 
     return templates.TemplateResponse(
         "index.html",
         {
             "request": request,
-            "films": films_for_template,
+            "films": [FilmRead.model_validate(film) for film in films],
             "genres": genres_for_template,
             "page": page,
             "total_pages": total_pages,
             "user_email": current_user.email if current_user else None,
-            "cdn": settings.cdn
+            "cdn": settings.cdn,
         },
     )
 
@@ -468,21 +364,22 @@ async def read_film(
     db: AsyncSession = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional),
 ):
-    stmt = select(Film).options(*COMMON_FILM_OPTIONS).filter(Film.id == id)
-    result = await db.execute(stmt)
-    film = result.scalars().first()
-    film = FilmRead.model_validate(film)
-    page_title = film.title
-    genres_for_template = await get_all_genres(db)
+    film_service = FilmService(db)
+    filter_service = FilterService(db)
+
+    film = await film_service.get_film_by_id(id)
+    film_schema = FilmRead.model_validate(film)
+    genres_for_template = await filter_service.genre_repo.get_all()
+
     return templates.TemplateResponse(
         "film_details.html",
         {
             "request": request,
-            "film": film,
+            "film": film_schema,
             "genres": genres_for_template,
-            "page_title": page_title,
+            "page_title": film_schema.title,
             "user_email": current_user.email if current_user else None,
-            "cdn": settings.cdn
+            "cdn": settings.cdn,
         },
     )
 
@@ -493,13 +390,10 @@ async def show_create_film_form(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user_required),
 ):
-    stmt_genre = select(Genre)
-    result_genre = await db.execute(stmt_genre)
-    genre_list = result_genre.scalars().all()
+    filter_service = FilterService(db)
 
-    stmt_country = select(Country)
-    result_country = await db.execute(stmt_country)
-    country_list = result_country.scalars().all()
+    genre_list = await filter_service.genre_repo.get_all()
+    country_list = await filter_service.country_repo.get_all()
 
     return templates.TemplateResponse(
         "create.html",
@@ -537,11 +431,8 @@ async def create_film(
             status_code=400, detail="Недопустимый тип контента"
         ) from None
 
-    if media_type != MediaType.movie:
-        title += " (Сериал)"
-
     try:
-        film_schemas = FilmCreate(
+        film_schema = FilmCreate(
             title=title,
             year=year,
             description=description,
@@ -552,30 +443,8 @@ async def create_film(
     except ValidationError as e:
         raise HTTPException(status_code=422, detail=e.errors()) from None
 
-    new_film = Film(
-        title=film_schemas.title,
-        year=film_schemas.year,
-        description=film_schemas.description,
-        rating=film_schemas.rating,
-        photo=film_schemas.photo,
-        type=media_type,
-    )
-
-    try:
-        db.add(new_film)
-        await db.flush()
-
-        for genre_id in genres:
-            db.add(FilmGenre(film_id=new_film.id, genre_id=genre_id))
-        for country_id in countries:
-            db.add(FilmCountry(film_id=new_film.id, country_id=country_id))
-
-        await db.commit()
-    except Exception:
-        await db.rollback()
-        raise HTTPException(
-            status_code=500, detail="Ошибка при создании фильма"
-        ) from None
+    film_service = FilmService(db)
+    new_film = await film_service.create_new_film(film_schema, genres, countries)
 
     background_tasks.add_task(send_email_async, new_film.title)
     return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
