@@ -157,7 +157,7 @@ class FilmRepository:
         self, film: Film, genre_ids: list[int], country_ids: list[int]
     ) -> Film:
         self.db.add(film)
-        await self.db.flush()  # Получаем ID сгенерированного фильма
+        await self.db.flush()
 
         for g_id in genre_ids:
             self.db.add(FilmGenre(film_id=film.id, genre_id=g_id))
