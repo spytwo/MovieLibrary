@@ -228,6 +228,7 @@ async def list_series(
             "page": page,
             "total_pages": total_pages,
             "user_email": current_user.email if current_user else None,
+            "cdn": settings.cdn,
         },
     )
 

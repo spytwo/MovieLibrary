@@ -33,7 +33,7 @@ class FilmService:
         self, page: int, page_size: int = 5
     ) -> tuple[list[Film], int]:
         offset = (page - 1) * page_size
-        total_films = await self.repo.count_by_type(film_type="series")
+        total_films = await self.repo.count_by_query(film_type="series")
         films = await self.repo.get_all(
             limit=page_size, offset=offset, film_type="series"
         )

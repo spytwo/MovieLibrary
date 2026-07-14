@@ -3,6 +3,8 @@ from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from movielibrary.models.enums import MediaType
+
 from .country import CountryRead
 from .genre import GenreRead
 
@@ -42,6 +44,7 @@ class FilmRead(FilmBase):
 
 class FilmCreate(FilmBase):
     photo: str
+    type: MediaType
 
 
 class FilmSearchResult(BaseModel):
