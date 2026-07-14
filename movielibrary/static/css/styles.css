@@ -3,19 +3,16 @@ body {
         Open Sans,
         sans-serif;
     margin: 0;
-    /* Заменили скучный серый на мягкий благородный серо-синий */
     background: #F0F4F8;
 }
 
 a {
-    /* Сделали текст ссылок не чисто черным, а глубоким темно-синим */
     color: #1B263B;
     font-size: 15px;
     text-decoration: none;
 }
 
 header {
-    /* Приятный технологичный синий */
     background: #4A90E2;
     color: #fff;
     padding: 15px 20px;
@@ -48,7 +45,6 @@ header input[type="text"] {
     border-radius: 3px;
     border: none;
     width: 200px;
-    /* Слегка подсветили поле ввода изнутри */
     background: rgba(255, 255, 255, 0.9);
     color: #1B263B;
 }
@@ -57,7 +53,6 @@ header button {
     padding: 5px 10px;
     border: none;
     border-radius: 3px;
-    /* Исправили ошибку в исходном коде (добавили #) и сделали контрастную кнопку */
     background: #2C3E50;
     color: #fff;
     cursor: pointer;
@@ -65,13 +60,11 @@ header button {
 
 a.login {
     padding: 8px 15px;
-    /* Сделали более мягкий и глубокий градиент */
     background: linear-gradient(45deg, #1B263B, #2C3E50);
     color: #fff;
     font-weight: bold;
     text-decoration: none;
     border-radius: 25px;
-    /* Смягчили тень, убрав грязь */
     box-shadow: 0 4px 10px rgba(27, 38, 59, 0.25);
     transition: all 0.3s ease;
 }
@@ -87,7 +80,6 @@ nav.genres {
     padding: 10px 20px;
     justify-content: center;
     background: #fff;
-    /* Добавили тонкую линию снизу вместо резкой тени */
     border-bottom: 1px solid #E1E8F0;
 }
 
@@ -95,7 +87,6 @@ nav.genres a {
     text-decoration: none;
     padding: 10px 20px;
     border-radius: 20px;
-    /* Заменили серый на пастельный сине-серый */
     background: #E1E8F0;
     color: #2C3E50;
     font-weight: bold;
@@ -126,7 +117,6 @@ main {
     background: #fff;
     border-radius: 8px;
     overflow: hidden;
-    /* Смягчили тени карточек */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -168,7 +158,6 @@ main {
 .movie-info p {
     margin: 2px 0;
     font-size: 14px;
-    /* Ослабили серый цвет до приятного стального */
     color: #5A6E85;
 }
 
@@ -191,7 +180,6 @@ main {
 
 .movie-info .rating {
     font-weight: bold;
-    /* Использовали благородный изумрудный вместо ядовито-зеленого */
     color: #2E7D32;
     margin-top: 5px;
 }
@@ -241,7 +229,6 @@ main {
     background: #fff;
     border-radius: 10px;
     overflow: hidden;
-    /* Красивая мягкая тень для большой карточки */
     box-shadow: 0 10px 30px rgba(27, 38, 59, 0.08);
     max-width: 900px;
     width: 100%;
@@ -358,7 +345,6 @@ main {
 
 .account-form input {
     padding: 10px;
-    /* Сделали рамку полей ввода мягче */
     border: 1px solid #D4E2EE;
     border-radius: 6px;
     font-size: 14px;
@@ -392,7 +378,6 @@ main {
     margin: 0 auto;
     padding: 10px 20px;
     border-radius: 25px;
-    /* Сделали градиент для кнопки выхода */
     background: linear-gradient(45deg, #1B263B, #2C3E50);
     color: #fff;
     font-weight: bold;
@@ -411,7 +396,6 @@ main {
     position: fixed;
     top: 80px;
     right: 50px;
-    /* Более глубокий и спокойный зеленый */
     background-color: #2E7D32;
     color: white;
     padding: 15px 25px;
@@ -436,7 +420,6 @@ main {
 }
 
 .popup.alert-error {
-    /* Более сдержанный благородный красный для ошибок */
     background-color: #C62828;
 }
 
