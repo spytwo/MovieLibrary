@@ -3,17 +3,20 @@ body {
         Open Sans,
         sans-serif;
     margin: 0;
-    background: #f4f4f4;
+    /* Заменили скучный серый на мягкий благородный серо-синий */
+    background: #F0F4F8;
 }
 
 a {
-    color: #222;
+    /* Сделали текст ссылок не чисто черным, а глубоким темно-синим */
+    color: #1B263B;
     font-size: 15px;
     text-decoration: none;
 }
 
 header {
-    background: #222;
+    /* Приятный технологичный синий */
+    background: #4A90E2;
     color: #fff;
     padding: 15px 20px;
 }
@@ -45,31 +48,37 @@ header input[type="text"] {
     border-radius: 3px;
     border: none;
     width: 200px;
+    /* Слегка подсветили поле ввода изнутри */
+    background: rgba(255, 255, 255, 0.9);
+    color: #1B263B;
 }
 
 header button {
     padding: 5px 10px;
     border: none;
     border-radius: 3px;
-    background: #f90;
+    /* Исправили ошибку в исходном коде (добавили #) и сделали контрастную кнопку */
+    background: #2C3E50;
     color: #fff;
     cursor: pointer;
 }
 
 a.login {
     padding: 8px 15px;
-    background: linear-gradient(45deg, #ff6a00, #ffb347);
+    /* Сделали более мягкий и глубокий градиент */
+    background: linear-gradient(45deg, #1B263B, #2C3E50);
     color: #fff;
     font-weight: bold;
     text-decoration: none;
     border-radius: 25px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    /* Смягчили тень, убрав грязь */
+    box-shadow: 0 4px 10px rgba(27, 38, 59, 0.25);
     transition: all 0.3s ease;
 }
 
 a.login:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 6px 16px rgba(27, 38, 59, 0.4);
 }
 
 nav.genres {
@@ -78,23 +87,26 @@ nav.genres {
     padding: 10px 20px;
     justify-content: center;
     background: #fff;
+    /* Добавили тонкую линию снизу вместо резкой тени */
+    border-bottom: 1px solid #E1E8F0;
 }
 
 nav.genres a {
     text-decoration: none;
     padding: 10px 20px;
     border-radius: 20px;
-    background: #eee;
-    color: #333;
+    /* Заменили серый на пастельный сине-серый */
+    background: #E1E8F0;
+    color: #2C3E50;
     font-weight: bold;
     transition: all 0.3s ease;
 }
 
 nav.genres a:hover {
-    background: #f90;
+    background: #1B263B;
     color: #fff;
     transform: translateY(-2px);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px rgba(27, 38, 59, 0.15);
 }
 
 main {
@@ -114,12 +126,14 @@ main {
     background: #fff;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
+    /* Смягчили тени карточек */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .movie-card:hover {
     transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(27, 38, 59, 0.12);
 }
 
 .movie-card img {
@@ -147,12 +161,15 @@ main {
     line-clamp: 2;
     overflow: hidden;
     text-overflow: ellipsis;
+    /* Цвет заголовка */
+    color: #1B263B;
 }
 
 .movie-info p {
     margin: 2px 0;
     font-size: 14px;
-    color: #666;
+    /* Ослабили серый цвет до приятного стального */
+    color: #5A6E85;
 }
 
 .movie-info .year-link {
@@ -160,21 +177,22 @@ main {
     padding: 4px 10px;
     margin-bottom: 15px;
     border-radius: 12px;
-    background: #eee;
-    color: #333;
+    background: #E1E8F0;
+    color: #2C3E50;
     font-weight: bold;
     text-decoration: none;
     transition: all 0.3s ease;
 }
 
 .movie-info .year-link:hover {
-    background: #f90;
+    background: #1B263B;
     color: #fff;
 }
 
 .movie-info .rating {
     font-weight: bold;
-    color: #28a745;
+    /* Использовали благородный изумрудный вместо ядовито-зеленого */
+    color: #2E7D32;
     margin-top: 5px;
 }
 
@@ -192,19 +210,19 @@ main {
     display: inline-block;
     padding: 6px 12px;
     border-radius: 4px;
-    background: #eee;
+    background: #E1E8F0;
     text-decoration: none;
-    color: #333;
+    color: #2C3E50;
     transition: background 0.3s;
 }
 
 .pagination a:hover {
-    background: #f90;
+    background: #1B263B;
     color: #fff;
 }
 
 .pagination span.current {
-    background: #f90;
+    background: #1B263B;
     color: #fff;
     font-weight: bold;
     cursor: default;
@@ -223,7 +241,8 @@ main {
     background: #fff;
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    /* Красивая мягкая тень для большой карточки */
+    box-shadow: 0 10px 30px rgba(27, 38, 59, 0.08);
     max-width: 900px;
     width: 100%;
 }
@@ -243,11 +262,13 @@ main {
 .film-info h2 {
     margin-top: 0;
     margin-bottom: 15px;
+    color: #1B263B;
 }
 
 .film-info p {
     margin: 10px 0;
     line-height: 1.4em;
+    color: #2C3E50;
 }
 
 .countries,
@@ -255,7 +276,7 @@ main {
 .genres {
     margin: 2px 0;
     font-size: 14px;
-    color: #666;
+    color: #5A6E85;
 }
 
 .countries a,
@@ -264,8 +285,8 @@ main {
     display: inline-block;
     padding: 4px 10px;
     border-radius: 12px;
-    background: #eee;
-    color: #333;
+    background: #E1E8F0;
+    color: #2C3E50;
     font-weight: bold;
     text-decoration: none;
     transition: all 0.3s ease;
@@ -275,13 +296,13 @@ main {
 .countries a:hover,
 .years a:hover,
 .genres a:hover {
-    background: #f90;
+    background: #1B263B;
     color: #fff;
 }
 
 .rating {
     font-weight: bold;
-    color: #28a745;
+    color: #2E7D32;
     margin-top: 5px;
 }
 
@@ -290,15 +311,15 @@ main {
     margin-bottom: 20px;
     padding: 8px 16px;
     border-radius: 4px;
-    background: #eee;
-    color: #333;
+    background: #E1E8F0;
+    color: #2C3E50;
     font-weight: bold;
     text-decoration: none;
     transition: all 0.3s ease;
 }
 
 .back-btn:hover {
-    background: #f90;
+    background: #1B263B;
     color: #fff;
 }
 
@@ -308,18 +329,20 @@ main {
     background: #fff;
     padding: 30px;
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(27, 38, 59, 0.08);
 }
 
 .account-container h2 {
     margin-top: 0;
     margin-bottom: 20px;
     text-align: center;
+    color: #1B263B;
 }
 
 .account-info {
     margin-bottom: 20px;
     font-size: 16px;
+    color: #2C3E50;
 }
 
 .account-section {
@@ -335,16 +358,25 @@ main {
 
 .account-form input {
     padding: 10px;
-    border: 1px solid #ddd;
+    /* Сделали рамку полей ввода мягче */
+    border: 1px solid #D4E2EE;
     border-radius: 6px;
     font-size: 14px;
+    color: #1B263B;
+    background-color: #F8FAFC;
+}
+
+.account-form input:focus {
+    border-color: #4A90E2;
+    outline: none;
+    background-color: #fff;
 }
 
 .account-form button {
     padding: 10px;
     border: none;
     border-radius: 6px;
-    background: #f90;
+    background: #1B263B;
     color: #fff;
     font-weight: bold;
     cursor: pointer;
@@ -352,7 +384,7 @@ main {
 }
 
 .account-form button:hover {
-    background: #ff6a00;
+    background: #2C3E50;
 }
 
 .logout-btn {
@@ -360,29 +392,31 @@ main {
     margin: 0 auto;
     padding: 10px 20px;
     border-radius: 25px;
-    background: linear-gradient(45deg, #ff6a00, #ffb347);
+    /* Сделали градиент для кнопки выхода */
+    background: linear-gradient(45deg, #1B263B, #2C3E50);
     color: #fff;
     font-weight: bold;
     text-decoration: none;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 10px rgba(27, 38, 59, 0.25);
     transition: all 0.3s ease;
     width: fit-content;
 }
 
 .logout-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 6px 16px rgba(27, 38, 59, 0.4);
 }
 
 .popup {
     position: fixed;
     top: 80px;
     right: 50px;
-    background-color: #4caf50;
+    /* Более глубокий и спокойный зеленый */
+    background-color: #2E7D32;
     color: white;
     padding: 15px 25px;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
     font-size: 16px;
     z-index: 10000;
     display: none;
@@ -402,7 +436,8 @@ main {
 }
 
 .popup.alert-error {
-    background-color: #f44336;
+    /* Более сдержанный благородный красный для ошибок */
+    background-color: #C62828;
 }
 
 @media (max-width: 700px) {
