@@ -263,6 +263,38 @@ async def search_films(
 
 
 @router.get(
+    "/rating/{rating}", response_class=HTMLResponse, summary="Read Films By Rating"
+)
+async def read_films_by_rating_page(
+    rating: float,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    page: int = Query(1, ge=1),
+    page_size: int = 5,
+    current_user: Optional[User] = Depends(get_current_user_optional),
+):
+    filter_service = FilterService(db)
+
+    films, total_pages = await filter_service.get_paginated_by_rating(
+        rating, page, page_size
+    )
+    genres_for_template = await filter_service.genre_repo.get_all()
+
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "films": [FilmRead.model_validate(film) for film in films],
+            "genres": genres_for_template,
+            "page": page,
+            "total_pages": total_pages,
+            "user_email": current_user.email if current_user else None,
+            "cdn": settings.cdn,
+        },
+    )
+
+
+@router.get(
     "/genres/{genre_name}", response_class=HTMLResponse, summary="Read Films By Genre"
 )
 async def read_films_by_genre(

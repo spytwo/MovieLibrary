@@ -151,7 +151,6 @@ main {
     line-clamp: 2;
     overflow: hidden;
     text-overflow: ellipsis;
-    /* Цвет заголовка */
     color: #1B263B;
 }
 
@@ -244,6 +243,23 @@ main {
 .film-info {
     padding: 20px;
     flex: 1;
+}
+
+.film-info .year-link {
+    display: inline-block;
+    padding: 4px 10px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    background: #E1E8F0;
+    color: #2C3E50;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.film-info .year-link:hover {
+    background: #1B263B;
+    color: #fff;
 }
 
 .film-info h2 {

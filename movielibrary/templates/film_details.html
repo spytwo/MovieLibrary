@@ -32,7 +32,12 @@ endblock %} {% block content %}
                 {% endfor %}
             </div>
 
-            <p class="rating">⭐ {{ film.rating }}</p>
+            <p class="rating">
+                    <a href="/rating/{{ film.rating }}" class="year-link"
+                        >⭐ {{ film.rating }}</a
+                    >
+                    
+                </p>
             <p><strong>Описание:</strong> {{ film.description }}</p>
         </div>
     </div>

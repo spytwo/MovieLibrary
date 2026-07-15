@@ -90,6 +90,23 @@ class FilmRepository:
         result = await self.db.execute(stmt)
         return result.scalar() or 0
 
+    async def get_by_rating(
+        self, rating: float, limit: int | None = None, offset: int | None = None
+    ) -> Sequence[Film]:
+        stmt = (
+            select(Film)
+            .options(*self.common_options)
+            .filter(Film.rating.between(rating - 0.01, rating + 0.01))
+            .order_by(desc(Film.id))
+        )
+        if limit is not None:
+            stmt = stmt.limit(limit)
+        if offset is not None:
+            stmt = stmt.offset(offset)
+
+        result = await self.db.execute(stmt)
+        return result.scalars().all()
+
     async def get_by_genre(
         self, genre_name: str, limit: int | None = None, offset: int | None = None
     ) -> Sequence[Film]:

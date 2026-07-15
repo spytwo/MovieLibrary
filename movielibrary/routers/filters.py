@@ -28,6 +28,18 @@ async def list_countries(db: AsyncSession = Depends(get_db)):
 
 
 @router.get(
+    "/rating/{rating}",
+    response_model=List[FilmRead],
+    summary="List Films By Rating",
+    description="Возвращает список всех фильмов, отфильтрованными по выбранному рейтингу",
+)
+async def read_films_by_rating(rating: float, db: AsyncSession = Depends(get_db)):
+    service = FilterService(db)
+    films = await service.filter_films_by_rating(rating)
+    return [FilmRead.model_validate(film) for film in films]
+
+
+@router.get(
     "/genres/{genre_name}",
     response_model=List[FilmRead],
     summary="List Films By Genre",

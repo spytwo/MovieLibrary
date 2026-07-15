@@ -15,7 +15,12 @@ endblock %} {% block content %}
                         >{{ film.year }}</a
                     >
                 </p>
-                <p class="rating">⭐ {{ film.rating }}</p>
+                <p class="rating">
+                    <a href="/rating/{{ film.rating }}" class="year-link"
+                        >⭐ {{ film.rating }}</a
+                    >
+                    
+                </p>
             </div>
         </a>
     </div>

@@ -18,6 +18,9 @@ class FilterService:
     async def get_countries_list(self) -> list[str]:
         return await self.country_repo.get_all_names()
 
+    async def filter_films_by_rating(self, rating: float) -> list[Film]:
+        return list(await self.film_repo.get_by_rating(rating))
+
     async def filter_films_by_genre(self, genre_name: str) -> list[Film]:
         return list(await self.film_repo.get_by_genre(genre_name))
 
@@ -55,5 +58,17 @@ class FilterService:
         offset = (page - 1) * page_size
         total_films = await self.film_repo.count_by_year(year)
         films = await self.film_repo.get_by_year(year, limit=page_size, offset=offset)
+        total_pages = (total_films + page_size - 1) // page_size
+        return list(films), total_pages
+
+    async def get_paginated_by_rating(
+        self, rating: float, page: int, page_size: int = 5
+    ) -> tuple[list[Film], int]:
+        offset = (page - 1) * page_size
+        all_films = await self.film_repo.get_by_rating(rating)
+        total_films = len(all_films)
+        films = await self.film_repo.get_by_rating(
+            rating, limit=page_size, offset=offset
+        )
         total_pages = (total_films + page_size - 1) // page_size
         return list(films), total_pages
