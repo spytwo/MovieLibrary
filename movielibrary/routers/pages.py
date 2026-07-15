@@ -27,11 +27,12 @@ from movielibrary.auth_utils import (
 from movielibrary.database import get_db
 from movielibrary.models import User
 from movielibrary.models.enums import MediaType
+from movielibrary.repositories.country import CountryRepository
+from movielibrary.repositories.genre import GenreRepository
 from movielibrary.schemas.film import FilmCreate, FilmRead
 from movielibrary.schemas.user import UserCreate
 from movielibrary.send_email import send_email_async
 from movielibrary.services.film import FilmService
-from movielibrary.services.filter import FilterService
 from settings import settings
 
 router = APIRouter()
@@ -47,10 +48,10 @@ async def read_films(
     current_user: Optional[User] = Depends(get_current_user_optional),
 ):
     film_service = FilmService(db)
-    filter_service = FilterService(db)
+    genre_repo = GenreRepository(db)
 
     films = await film_service.get_latest_films_for_index(limit=5)
-    genres_for_template = await filter_service.genre_repo.get_all()
+    genres_for_template = await genre_repo.get_all()
 
     return templates.TemplateResponse(
         "index.html",
@@ -214,10 +215,12 @@ async def list_series(
     current_user: Optional[User] = Depends(get_current_user_optional),
 ):
     film_service = FilmService(db)
-    filter_service = FilterService(db)
+    genre_repo = GenreRepository(db)
 
-    films, total_pages = await film_service.get_paginated_series(page, page_size)
-    genres_for_template = await filter_service.genre_repo.get_all()
+    films, total_pages = await film_service.get_paginated_films(
+        page=page, page_size=page_size, film_type="series"
+    )
+    genres_for_template = await genre_repo.get_all()
 
     return templates.TemplateResponse(
         "index.html",
@@ -243,10 +246,12 @@ async def search_films(
     current_user: Optional[User] = Depends(get_current_user_optional),
 ):
     film_service = FilmService(db)
-    filter_service = FilterService(db)
+    genre_repo = GenreRepository(db)
 
-    films, total_pages = await film_service.get_paginated_search(q, page, page_size)
-    genres_for_template = await filter_service.genre_repo.get_all()
+    films, total_pages = await film_service.get_paginated_films(
+        page=page, page_size=page_size, q=q
+    )
+    genres_for_template = await genre_repo.get_all()
 
     return templates.TemplateResponse(
         "index.html",
@@ -273,12 +278,13 @@ async def read_films_by_rating_page(
     page_size: int = 5,
     current_user: Optional[User] = Depends(get_current_user_optional),
 ):
-    filter_service = FilterService(db)
+    film_service = FilmService(db)
+    genre_repo = GenreRepository(db)
 
-    films, total_pages = await filter_service.get_paginated_by_rating(
-        rating, page, page_size
+    films, total_pages = await film_service.get_paginated_films(
+        page=page, page_size=page_size, rating=rating
     )
-    genres_for_template = await filter_service.genre_repo.get_all()
+    genres_for_template = await genre_repo.get_all()
 
     return templates.TemplateResponse(
         "index.html",
@@ -305,12 +311,13 @@ async def read_films_by_genre(
     page_size: int = 5,
     current_user: Optional[User] = Depends(get_current_user_optional),
 ):
-    filter_service = FilterService(db)
+    film_service = FilmService(db)
+    genre_repo = GenreRepository(db)
 
-    films, total_pages = await filter_service.get_paginated_by_genre(
-        genre_name, page, page_size
+    films, total_pages = await film_service.get_paginated_films(
+        page=page, page_size=page_size, genre_name=genre_name
     )
-    genres_for_template = await filter_service.genre_repo.get_all()
+    genres_for_template = await genre_repo.get_all()
 
     return templates.TemplateResponse(
         "index.html",
@@ -339,12 +346,13 @@ async def read_films_by_country(
     page_size: int = 5,
     current_user: Optional[User] = Depends(get_current_user_optional),
 ):
-    filter_service = FilterService(db)
+    film_service = FilmService(db)
+    genre_repo = GenreRepository(db)
 
-    films, total_pages = await filter_service.get_paginated_by_country(
-        country_name, page, page_size
+    films, total_pages = await film_service.get_paginated_films(
+        page=page, page_size=page_size, country_name=country_name
     )
-    genres_for_template = await filter_service.genre_repo.get_all()
+    genres_for_template = await genre_repo.get_all()
 
     return templates.TemplateResponse(
         "index.html",
@@ -369,12 +377,13 @@ async def read_films_by_year(
     page_size: int = 5,
     current_user: Optional[User] = Depends(get_current_user_optional),
 ):
-    filter_service = FilterService(db)
+    film_service = FilmService(db)
+    genre_repo = GenreRepository(db)
 
-    films, total_pages = await filter_service.get_paginated_by_year(
-        year, page, page_size
+    films, total_pages = await film_service.get_paginated_films(
+        page=page, page_size=page_size, year=year
     )
-    genres_for_template = await filter_service.genre_repo.get_all()
+    genres_for_template = await genre_repo.get_all()
 
     return templates.TemplateResponse(
         "index.html",
@@ -398,11 +407,11 @@ async def read_film(
     current_user: Optional[User] = Depends(get_current_user_optional),
 ):
     film_service = FilmService(db)
-    filter_service = FilterService(db)
+    genre_repo = GenreRepository(db)
 
     film = await film_service.get_film_by_id(id)
     film_schema = FilmRead.model_validate(film)
-    genres_for_template = await filter_service.genre_repo.get_all()
+    genres_for_template = await genre_repo.get_all()
 
     return templates.TemplateResponse(
         "film_details.html",
@@ -423,10 +432,11 @@ async def show_create_film_form(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user_required),
 ):
-    filter_service = FilterService(db)
+    genre_repo = GenreRepository(db)
+    country_repo = CountryRepository(db)
 
-    genre_list = await filter_service.genre_repo.get_all()
-    country_list = await filter_service.country_repo.get_all()
+    genre_list = await genre_repo.get_all()
+    country_list = await country_repo.get_all()
 
     return templates.TemplateResponse(
         "create.html",
