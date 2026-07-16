@@ -31,12 +31,13 @@ from movielibrary.repositories.country import CountryRepository
 from movielibrary.repositories.genre import GenreRepository
 from movielibrary.schemas.film import FilmCreate, FilmRead
 from movielibrary.schemas.user import UserCreate
-from movielibrary.send_email import send_email_async
+from movielibrary.send_email import send_movie_alert
 from movielibrary.services.film import FilmService
 from settings import settings
 
 router = APIRouter()
 templates = Jinja2Templates(directory="movielibrary/templates")
+
 
 MINUTE_IN_SECONDS = 60
 
@@ -489,5 +490,5 @@ async def create_film(
     film_service = FilmService(db)
     new_film = await film_service.create_new_film(film_schema, genres, countries)
 
-    background_tasks.add_task(send_email_async, new_film.title)
+    background_tasks.add_task(send_movie_alert, new_film.title)
     return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
