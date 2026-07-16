@@ -143,7 +143,7 @@ async def forgot_password(
 
     background_tasks.add_task(send_password_reset, email, new_password)
 
-    return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
 
 
 @router.get("/login", response_class=HTMLResponse, summary="Login Form")
