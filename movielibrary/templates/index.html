@@ -1,30 +1,42 @@
 {% extends "base.html" %} {% block title %}FilmLibrary - Фильмы и Сериалы{%
 endblock %} {% block content %}
 <div class="movies-grid">
-    {% for film in films %}
-    <div class="movie-card">
-        <a href="/film/{{ film.id }}">
-            <img
-                src="{{ cdn }}{{ film.photo }}"
-                alt="{{ film.title }}"
-            />
-            <div class="movie-info">
-                <h3>{{ film.title }}</h3>
-                <p>
-                    <a href="/years/{{ film.year }}" class="year-link"
-                        >{{ film.year }}</a
-                    >
-                </p>
-                <p class="rating">
-                    <a href="/rating/{{ film.rating }}" class="year-link"
-                        >⭐ {{ film.rating }}</a
-                    >
-                    
-                </p>
-            </div>
-        </a>
-    </div>
-    {% endfor %}
+    {% if films %}
+        {% for film in films %}
+        <div class="movie-card">
+            <a href="/film/{{ film.id }}">
+                <img
+                    src="{{ cdn }}{{ film.photo }}"
+                    alt="{{ film.title }}"
+                />
+                <div class="movie-info">
+                    <h3>{{ film.title }}</h3>
+                    <p>
+                        <a href="/years/{{ film.year }}" class="year-link"
+                            >{{ film.year }}</a
+                        >
+                    </p>
+                    <p class="rating">
+                        <a href="/rating/{{ film.rating }}" class="year-link"
+                            >⭐ {{ film.rating }}</a
+                        >
+                        
+                    </p>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="no-results">
+            {% if request.query_params.get('q') and request.query_params.get('q')|length < 3 %}
+                <h2>Слишком короткий запрос</h2>
+                <p>В поиске должно быть введено минимум 3 символа</p>
+            {% else %}
+                <h2>Ничего не найдено</h2>
+                <p>Попробуйте изменить поисковый запрос</p>
+            {% endif %}
+        </div>
+    {% endif %}
 </div>
 
 <div class="pagination">

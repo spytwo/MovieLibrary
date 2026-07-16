@@ -439,6 +439,36 @@ main {
     background-color: #C62828;
 }
 
+.no-results {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    
+    width: 90%;
+    max-width: 450px;
+}
+
+.no-results h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1B263B;
+    margin: 0;
+}
+
+.no-results p {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #5A6E85;
+    margin: 0;
+}
+
 @media (max-width: 700px) {
     .film-card {
         flex-direction: column;
