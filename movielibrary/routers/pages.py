@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone  # Изменено для корректного UTC
 from typing import List, Optional
 
 from fastapi import (
@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from movielibrary.auth_utils import (
     create_access_token,
+    generate_temporary_password,
     get_current_user_optional,
     get_current_user_required,
     get_password_hash,
@@ -31,13 +32,12 @@ from movielibrary.repositories.country import CountryRepository
 from movielibrary.repositories.genre import GenreRepository
 from movielibrary.schemas.film import FilmCreate, FilmRead
 from movielibrary.schemas.user import UserCreate
-from movielibrary.send_email import send_movie_alert
+from movielibrary.send_email import send_movie_alert, send_password_reset
 from movielibrary.services.film import FilmService
 from settings import settings
 
 router = APIRouter()
 templates = Jinja2Templates(directory="movielibrary/templates")
-
 
 MINUTE_IN_SECONDS = 60
 
@@ -119,6 +119,33 @@ async def register(
     return response
 
 
+@router.get(
+    "/forgot_password", response_class=HTMLResponse, summary="Forgot Password Form"
+)
+async def forgot_password_form(request: Request):
+    return templates.TemplateResponse("forgot_password.html", {"request": request})
+
+
+@router.post("/forgot_password", summary="Forgot Password")
+async def forgot_password(
+    background_tasks: BackgroundTasks,
+    email: str = Form(...),
+    db: AsyncSession = Depends(get_db),
+):
+    user = await get_user_by_email(db, email)
+
+    if not user:
+        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+
+    new_password = generate_temporary_password()
+    user.password_hash = get_password_hash(new_password)
+    await db.commit()
+
+    background_tasks.add_task(send_password_reset, email, new_password)
+
+    return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+
+
 @router.get("/login", response_class=HTMLResponse, summary="Login Form")
 async def login_form(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
@@ -137,7 +164,7 @@ async def login(
     if not verify_password(password, user.password_hash):
         raise HTTPException(status_code=400, detail="Неправильный пароль")
 
-    user.last_login = datetime.utcnow()
+    user.last_login = datetime.now(timezone.utc).replace(tzinfo=None)
     await db.commit()
 
     token = create_access_token(email=user.email)
@@ -173,24 +200,26 @@ async def account(
 )
 async def change_password(
     request: Request,
-    current_user: Optional[User] = Depends(get_current_user_optional),
     old_password: str = Form(...),
     new_password: str = Form(..., min_length=6),
     confirm_password: str = Form(...),
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_required),
 ):
     if new_password != confirm_password:
         raise HTTPException(status_code=400, detail="Пароли не совпадают")
     if not verify_password(old_password, current_user.password_hash):
         raise HTTPException(status_code=400, detail="Неверный старый пароль")
+
     current_user.password_hash = get_password_hash(new_password)
     db.add(current_user)
     await db.commit()
+
     return templates.TemplateResponse(
         "account.html",
         {
             "request": request,
-            "user_email": current_user.email if current_user else None,
+            "user_email": current_user.email,
             "message": "Пароль успешно изменён",
         },
     )
@@ -203,11 +232,7 @@ async def logout():
     return response
 
 
-@router.get(
-    "/series",
-    summary="List Films with pagination",
-    description="Возвращает список всех сериалов с жанрами и странами",
-)
+@router.get("/series", summary="List Films with pagination")
 async def list_series(
     request: Request,
     db: AsyncSession = Depends(get_db),

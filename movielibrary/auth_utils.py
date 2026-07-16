@@ -1,3 +1,5 @@
+import secrets
+import string
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -156,3 +158,8 @@ async def get_current_user_optional(
         return None
     user = await get_user_by_email(db, email)
     return user
+
+
+def generate_temporary_password(length=12):
+    alphabet = string.ascii_letters + string.digits + "!@#$%^&*"
+    return "".join(secrets.choice(alphabet) for _ in range(length))

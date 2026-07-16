@@ -1,3 +1,4 @@
+import asyncio
 from email.mime.text import MIMEText
 
 import aiosmtplib
@@ -30,11 +31,25 @@ async def send_movie_alert(movie_title: str):
     receiver_emails = [
         email.strip() for email in settings.receiver_emails.split(",") if email.strip()
     ]
+    tasks = []
     for email in receiver_emails:
         text = f"Мы посмотрели новый фильм: {movie_title}"
-        await _send_base_email(email, "Привет от FilmLibrary!", text)
+        tasks.append(_send_base_email(email, "Привет от FilmLibrary!", text))
+
+    if tasks:
+        await asyncio.gather(*tasks, return_exceptions=True)
 
 
-async def send_password_reset(receiver_email: str, new_password: str = "456321"):
-    text = f"Пароль для входа: {new_password}"
-    await _send_base_email(receiver_email, "Восстановление пароля", text)
+async def send_password_reset(receiver_email: str, new_password: str):
+    text = f"""Здравствуйте!
+
+Ваш пароль на FilmLibrary был сброшен.
+
+🔑 Новый пароль: {new_password}
+
+Рекомендуем изменить его сразу после входа в аккаунт.
+
+С уважением,
+Команда FilmLibrary"""
+
+    await _send_base_email(receiver_email, "Восстановление пароля — FilmLibrary", text)

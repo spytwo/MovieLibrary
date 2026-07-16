@@ -6,25 +6,28 @@
         <title>Личный кабинет</title>
         <link rel="stylesheet" href="/static/css/styles.css" />
         <script>
-            function showPopup(message) {
-              const popup = document.getElementById('popup-message');
-              const text = document.getElementById('popup-text');
-              text.textContent = message;
-              popup.style.display = 'block';
-              setTimeout(() => {
-                popup.style.display = 'none';
-              }, 3000);
-            }
-            function hidePopup() {
-              document.getElementById('popup-message').style.display = 'none';
-            }
+    function showPopup(message) {
+      const popup = document.getElementById('popup-message');
+      const text = document.getElementById('popup-text');
+      text.textContent = message;
+      popup.style.display = 'block';
+      setTimeout(() => {
+        popup.style.display = 'none';
+      }, 3000);
+    }
+    function hidePopup() {
+      document.getElementById('popup-message').style.display = 'none';
+    }
 
-            document.addEventListener("DOMContentLoaded", function() {
-              {% if message %}
-                showPopup("{{ message }}");
-              {% endif %}
-            });
-        </script>
+    document.addEventListener("DOMContentLoaded", function() {
+        
+      const serverMessage = "{{ message or '' }}";
+      
+      if (serverMessage) {
+        showPopup(serverMessage);
+      }
+    });
+</script>
     </head>
     <body>
         <header>
@@ -46,23 +49,27 @@
                         method="post"
                         action="/account/change_password"
                         class="account-form"
+                        autocomplete="off"
                     >
                         <input
                             type="password"
                             name="old_password"
                             placeholder="Старый пароль"
+                            autocomplete="current-password"
                             required
                         />
                         <input
                             type="password"
                             name="new_password"
                             placeholder="Новый пароль"
+                            autocomplete="new-password"
                             required
                         />
                         <input
                             type="password"
                             name="confirm_password"
                             placeholder="Повторите новый пароль"
+                            autocomplete="new-password"
                             required
                         />
                         <button type="submit">Изменить</button>
