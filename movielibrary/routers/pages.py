@@ -1,4 +1,4 @@
-from datetime import datetime, timezone  # Изменено для корректного UTC
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from fastapi import (
@@ -26,6 +26,7 @@ from movielibrary.auth_utils import (
     verify_password,
 )
 from movielibrary.database import get_db
+from movielibrary.mappers.film import film_to_read
 from movielibrary.models import User
 from movielibrary.models.enums import MediaType
 from movielibrary.repositories.country import CountryRepository
@@ -58,7 +59,7 @@ async def read_films(
         "index.html",
         {
             "request": request,
-            "films": [FilmRead.model_validate(film) for film in films],
+            "films": [film_to_read(film) for film in films],
             "genres": genres_for_template,
             "page": 1,
             "total_pages": 1,
@@ -252,7 +253,7 @@ async def list_series(
         "index.html",
         {
             "request": request,
-            "films": [FilmRead.model_validate(film) for film in films],
+            "films": [film_to_read(film) for film in films],
             "genres": genres_for_template,
             "page": page,
             "total_pages": total_pages,
@@ -283,7 +284,7 @@ async def search_films(
         "index.html",
         {
             "request": request,
-            "films": [FilmRead.model_validate(film) for film in films],
+            "films": [film_to_read(film) for film in films],
             "genres": genres_for_template,
             "page": page,
             "total_pages": total_pages,
@@ -316,7 +317,7 @@ async def read_films_by_rating_page(
         "index.html",
         {
             "request": request,
-            "films": [FilmRead.model_validate(film) for film in films],
+            "films": [film_to_read(film) for film in films],
             "genres": genres_for_template,
             "page": page,
             "total_pages": total_pages,
@@ -349,7 +350,7 @@ async def read_films_by_genre(
         "index.html",
         {
             "request": request,
-            "films": [FilmRead.model_validate(film) for film in films],
+            "films": [film_to_read(film) for film in films],
             "genres": genres_for_template,
             "page": page,
             "total_pages": total_pages,
@@ -384,7 +385,7 @@ async def read_films_by_country(
         "index.html",
         {
             "request": request,
-            "films": [FilmRead.model_validate(film) for film in films],
+            "films": [film_to_read(film) for film in films],
             "genres": genres_for_template,
             "page": page,
             "total_pages": total_pages,
@@ -415,7 +416,7 @@ async def read_films_by_year(
         "index.html",
         {
             "request": request,
-            "films": [FilmRead.model_validate(film) for film in films],
+            "films": [film_to_read(film) for film in films],
             "genres": genres_for_template,
             "page": page,
             "total_pages": total_pages,
