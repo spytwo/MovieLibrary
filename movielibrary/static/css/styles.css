@@ -107,13 +107,17 @@ main {
 }
 
 /* Стили для index */
+
 .movies-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 7px;
 }
 
 .movie-card {
+    width: 270px;
+    flex-shrink: 0;
     background: #fff;
     border-radius: 8px;
     overflow: hidden;
@@ -229,13 +233,13 @@ main {
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(27, 38, 59, 0.08);
-    max-width: 900px;
+    max-width: 950px;
     width: 100%;
 }
 
 .film-card img {
-    width: 330px;
-    height: 510px;
+    width: 350px;
+    height: 565px;
     object-fit: cover;
     flex-shrink: 0;
 }
