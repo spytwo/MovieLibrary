@@ -287,6 +287,7 @@ async def search_films(
             "genres": genres_for_template,
             "page": page,
             "total_pages": total_pages,
+            "query": q or "",
             "user_email": current_user.email if current_user else None,
             "cdn": settings.cdn,
         },
