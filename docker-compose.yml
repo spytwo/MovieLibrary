@@ -7,6 +7,7 @@ services:
       - "127.0.0.1:8002:8000"
     depends_on:
       - db
+      - redis
     env_file: .env
 
   db:
@@ -17,6 +18,13 @@ services:
       - postgres_data:/var/lib/postgresql
       - ./backup:/docker-entrypoint-initdb.d
 
+  redis:
+    image: redis:7-alpine
+    container_name: movielibrary_redis
+    ports:
+      - "127.0.0.1:6379:6379"
+    restart: always
+  
   # bot:
   #   build:
   #     context: ./telegrambot

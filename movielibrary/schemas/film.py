@@ -1,7 +1,7 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator
 
 from movielibrary.models.enums import MediaType
 
@@ -36,10 +36,10 @@ class FilmBase(BaseModel):
 class FilmRead(FilmBase):
     id: int
     photo: str
-    genres: List[GenreRead] = Field(..., alias="genre_list")
-    countries: List[CountryRead] = Field(..., alias="country_list")
+    genres: list[GenreRead]
+    countries: list[CountryRead]
 
-    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+    model_config = ConfigDict(from_attributes=True)
 
 
 class FilmCreate(FilmBase):

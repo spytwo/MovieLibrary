@@ -15,3 +15,6 @@ fix:
 
 logs:
     docker compose logs
+
+redis:
+    docker exec -it movielibrary_redis redis-cli
