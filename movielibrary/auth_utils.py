@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from movielibrary.database import get_db
 from movielibrary.models import User
-from settings import settings
+from movielibrary.settings import settings
 
 SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm

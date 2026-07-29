@@ -85,7 +85,9 @@ async def handle_genre_callback(call: types.CallbackQuery):
         return
 
     if offset == 0:
-        await call.message.answer(f"Movies of the genre *{genre}*:", parse_mode="Markdown")
+        await call.message.answer(
+            f"Movies of the genre *{genre}*:", parse_mode="Markdown"
+        )
 
     films_slice = films[offset : offset + 5]
 

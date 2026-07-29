@@ -34,7 +34,7 @@ from movielibrary.schemas.film import FilmCreate, FilmRead
 from movielibrary.schemas.user import UserCreate
 from movielibrary.send_email import send_movie_alert, send_password_reset
 from movielibrary.services.film import FilmService
-from settings import settings
+from movielibrary.settings import settings
 
 router = APIRouter()
 templates = Jinja2Templates(directory="movielibrary/templates")

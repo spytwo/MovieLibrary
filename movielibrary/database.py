@@ -2,7 +2,7 @@ from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from settings import settings
+from movielibrary.settings import settings
 
 DATABASE_URL = settings.database_url
 DB_POOL_SIZE = int(settings.db_pool_size)

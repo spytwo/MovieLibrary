@@ -3,7 +3,7 @@ from email.mime.text import MIMEText
 
 import aiosmtplib
 
-from settings import settings
+from movielibrary.settings import settings
 
 sender_email = settings.email
 password = settings.email_app_password

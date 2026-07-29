@@ -9,7 +9,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from movielibrary.redis import close_redis, redis_client
 from movielibrary.routers import countries, films, genres, pages
-from settings import settings
+from movielibrary.settings import settings
 
 
 @asynccontextmanager
