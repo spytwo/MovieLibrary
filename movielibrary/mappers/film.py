@@ -12,8 +12,8 @@ def film_to_read(film: Film) -> FilmRead:
         description=film.description,
         rating=film.rating,
         photo=film.photo,
-        genres=[GenreRead.model_validate(fg.genre) for fg in film.genres],
-        countries=[CountryRead.model_validate(fc.country) for fc in film.countries],
+        genres=[GenreRead.model_validate(g) for g in film.genre_list],
+        countries=[CountryRead.model_validate(c) for c in film.country_list],
     )
 
 

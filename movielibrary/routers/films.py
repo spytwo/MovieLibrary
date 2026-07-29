@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Depends, Query, Request
-from fastapi_cache.decorator import cache
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from movielibrary.cache.keys import key_builder
 from movielibrary.database import get_db
 from movielibrary.schemas.film import FilmRead
 from movielibrary.services.film import FilmService
@@ -14,10 +12,6 @@ router = APIRouter()
     "",
     response_model=list[FilmRead],
     summary="List and Filter Films",
-)
-@cache(
-    expire=360,
-    key_builder=key_builder,
 )
 async def list_films(
     q: str | None = Query(None, min_length=3),
@@ -51,10 +45,6 @@ async def list_films(
     response_model=dict[str, float],
     summary="Get films statistics",
 )
-@cache(
-    expire=360,
-    key_builder=key_builder,
-)
 async def get_films_statistics(request: Request, db: AsyncSession = Depends(get_db)):
     service = FilmService(db)
     return await service.get_statistics()
@@ -64,10 +54,6 @@ async def get_films_statistics(request: Request, db: AsyncSession = Depends(get_
     "/{film_id}",
     response_model=FilmRead,
     summary="Retrieve Film",
-)
-@cache(
-    expire=360,
-    key_builder=key_builder,
 )
 async def retrieve_film(
     request: Request, film_id: int, db: AsyncSession = Depends(get_db)

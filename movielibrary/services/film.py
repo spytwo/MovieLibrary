@@ -1,6 +1,8 @@
 from fastapi import HTTPException
+from fastapi_cache.decorator import cache
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from movielibrary.cache.keys import key_builder
 from movielibrary.mappers.film import film_to_read, films_to_read
 from movielibrary.models import Film
 from movielibrary.models.enums import MediaType
@@ -12,6 +14,7 @@ class FilmService:
     def __init__(self, db: AsyncSession):
         self.repo = FilmRepository(db)
 
+    @cache(expire=360, key_builder=key_builder)
     async def get_film_by_id(self, film_id: int) -> FilmRead:
         film = await self.repo.get_by_id(film_id)
 
@@ -23,17 +26,21 @@ class FilmService:
 
         return film_to_read(film)
 
+    @cache(expire=360, key_builder=key_builder)
     async def get_statistics(self) -> dict:
         return await self.repo.get_global_statistics()
 
+    @cache(expire=360, key_builder=key_builder)
     async def get_films_list(self, **filters) -> list[FilmRead]:
         films = await self.repo.get_multi(**filters)
         return films_to_read(list(films))
 
+    @cache(expire=360, key_builder=key_builder)
     async def get_latest_films_for_index(self, limit: int = 5) -> list[FilmRead]:
         films = await self.repo.get_multi(limit=limit)
         return films_to_read(list(films))
 
+    @cache(expire=360, key_builder=key_builder)
     async def get_paginated_films(
         self, page: int, page_size: int = 5, **filters
     ) -> tuple[list[FilmRead], int]:

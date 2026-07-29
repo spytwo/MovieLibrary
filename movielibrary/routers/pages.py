@@ -26,12 +26,11 @@ from movielibrary.auth_utils import (
     verify_password,
 )
 from movielibrary.database import get_db
-from movielibrary.mappers.film import film_to_read
 from movielibrary.models import User
 from movielibrary.models.enums import MediaType
 from movielibrary.repositories.country import CountryRepository
 from movielibrary.repositories.genre import GenreRepository
-from movielibrary.schemas.film import FilmCreate, FilmRead
+from movielibrary.schemas.film import FilmCreate
 from movielibrary.schemas.user import UserCreate
 from movielibrary.send_email import send_movie_alert, send_password_reset
 from movielibrary.services.film import FilmService
@@ -59,7 +58,7 @@ async def read_films(
         "index.html",
         {
             "request": request,
-            "films": [film_to_read(film) for film in films],
+            "films": films,
             "genres": genres_for_template,
             "page": 1,
             "total_pages": 1,
@@ -253,7 +252,7 @@ async def list_series(
         "index.html",
         {
             "request": request,
-            "films": [film_to_read(film) for film in films],
+            "films": films,
             "genres": genres_for_template,
             "page": page,
             "total_pages": total_pages,
@@ -284,7 +283,7 @@ async def search_films(
         "index.html",
         {
             "request": request,
-            "films": [film_to_read(film) for film in films],
+            "films": films,
             "genres": genres_for_template,
             "page": page,
             "total_pages": total_pages,
@@ -317,7 +316,7 @@ async def read_films_by_rating_page(
         "index.html",
         {
             "request": request,
-            "films": [film_to_read(film) for film in films],
+            "films": films,
             "genres": genres_for_template,
             "page": page,
             "total_pages": total_pages,
@@ -350,7 +349,7 @@ async def read_films_by_genre(
         "index.html",
         {
             "request": request,
-            "films": [film_to_read(film) for film in films],
+            "films": films,
             "genres": genres_for_template,
             "page": page,
             "total_pages": total_pages,
@@ -385,7 +384,7 @@ async def read_films_by_country(
         "index.html",
         {
             "request": request,
-            "films": [film_to_read(film) for film in films],
+            "films": films,
             "genres": genres_for_template,
             "page": page,
             "total_pages": total_pages,
@@ -416,7 +415,7 @@ async def read_films_by_year(
         "index.html",
         {
             "request": request,
-            "films": [film_to_read(film) for film in films],
+            "films": films,
             "genres": genres_for_template,
             "page": page,
             "total_pages": total_pages,
@@ -436,8 +435,7 @@ async def read_film(
     film_service = FilmService(db)
     genre_repo = GenreRepository(db)
 
-    film = await film_service.get_film_by_id(id)
-    film_schema = FilmRead.model_validate(film)
+    film_schema = await film_service.get_film_by_id(id)
     genres_for_template = await genre_repo.get_all()
 
     return templates.TemplateResponse(

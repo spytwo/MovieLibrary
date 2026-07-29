@@ -1,5 +1,5 @@
 up:
-    docker compose up --build
+    docker compose up --build -d
 
 down:
     docker compose down
@@ -15,3 +15,6 @@ fix:
 
 logs:
     docker compose logs
+
+redis:
+    docker exec -it movielibrary_redis redis-cli
