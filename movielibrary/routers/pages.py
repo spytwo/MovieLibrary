@@ -30,7 +30,7 @@ from movielibrary.models import User
 from movielibrary.models.enums import MediaType
 from movielibrary.repositories.country import CountryRepository
 from movielibrary.repositories.genre import GenreRepository
-from movielibrary.schemas.film import FilmCreate
+from movielibrary.schemas.film import FilmCreate, FilmRead
 from movielibrary.schemas.user import UserCreate
 from movielibrary.send_email import send_movie_alert, send_password_reset
 from movielibrary.services.film import FilmService
@@ -436,7 +436,12 @@ async def read_film(
     film_service = FilmService(db)
     genre_repo = GenreRepository(db)
 
-    film_schema = await film_service.get_film_by_id(id)
+    film_data = await film_service.get_film_by_id(id)
+
+    if isinstance(film_data, dict):
+        film_schema = FilmRead(**film_data)
+    else:
+        film_schema = film_data
     genres_for_template = await genre_repo.get_all()
 
     return templates.TemplateResponse(
