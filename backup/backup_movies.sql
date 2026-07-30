@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 0e4H88Gqhw5izwAWUuBvjIkKuG8GfPwEypXsGhwUNuyQCfhHjW9u7JsS6BdVWvQ
+\restrict FlDA3G7v0GJVi0EPAWQnCiJffzHkI0ivHgAYGHHROfMJrWnyvx5KzeFAb8AFiik
 
 -- Dumped from database version 18.2 (Debian 18.2-1.pgdg13+1)
 -- Dumped by pg_dump version 18.2 (Debian 18.2-1.pgdg13+1)
@@ -751,6 +751,8 @@ COPY public.film_country (film_id, country_id) FROM stdin;
 307	1
 307	2
 307	39
+309	3
+311	1
 \.
 
 
@@ -1135,6 +1137,9 @@ COPY public.film_genre (film_id, genre_id) FROM stdin;
 305	9
 306	4
 307	1
+309	1
+311	1
+311	9
 \.
 
 
@@ -1421,6 +1426,8 @@ COPY public.films (id, title, year, description, rating, photo, type) FROM stdin
 305	Горничная	2025	Милли устраивается прислугой с проживанием к состоятельной семье Винчестер, живущей в загородном особняке. Девушка только что вышла по УДО, и ей необходима эта работа, но находить общий язык с хозяйкой Ниной становится всё сложнее: та заметно не в себе и регулярно к ней цепляется. Зато её супруг Эндрю — само очарование. Мужчина сглаживает любые конфликты и, кажется, положил глаз на Милли.	7.7	TheHousemaid.webp	movie
 306	Обсессия	2025	Беар давно влюблён в красавицу Никки, с которой они дружат ещё со школы. Парень опасается, что безнадёжно застрял во френдзоне, и никак не может решиться на признание. Однажды в магазине эзотерики он находит странную безделушку — волшебную палочку, которая может исполнить одно желание. Беар загадывает, чтобы Никки любила его больше всех на свете, и внезапно девушка действительно в него влюбляется. Но счастью парня быстро приходит конец — теперь Никки буквально одержима объектом своего обожания и ведёт себя всё более жутко.	7.2	Obsession.webp	movie
 307	Последний дом слева	2009	Мама, папа и дочь отправляются в загородный дом, чтобы счастливо провести выходные дни. Сначала кажется удивительным, что дочь-подросток соглашается провести свободное время подобным образом. Но все очень просто - недалеко от этого дома находится городок, где живет ее лучшая подруга. Девушки встречаются и знакомятся со странным парнем, у которого есть травка.\r\n\r\nКомпания приходит в отель и готовится оттянуться по-взрослому, но в самый неподходящий момент появляются беглые преступники, которые начинают жестоко глумиться над девчонками. Затем они перемещаются в тот самый последний дом слева, где сталкиваются с родителями девушки. Ничего не подозревающие родители предоставляют кров преступникам, но затем события развиваются по жестокому сценарию.	6.8	TheLastHouseontheLeft.webp	movie
+309	Фейк (Сериал)	2025	Учительницу лицея Риту начинает преследовать киберсталкер. Девушка понимает, что в окружении слишком много людей, у которых есть весомые причины превратить её жизнь в кошмар. Он бьёт по самым больным точкам: работа, ученики, друзья, семья, вера в себя. Рита пытается понять, кто этот таинственный преследователь, и чего он хочет. Перебирая и подбирая ключики к бывшему парню, ученикам и коллегам, друзьям и даже близким, Рита понимает, что она больше не может никому доверять.	8	fake.webp	series
+311	Добрый медбрат	2022	Чарльз Каллен был на хорошем счету в больнице, проработал медбратом 16 лет, и, как считает полиция, за это время убил около 300 человек. В жизни он был любящим отцом, заботливым мужем, примерным сыном и приятным коллегой. Полицейские убеждают медсестру, знакомую с Калленом, помочь им в поимке преступника.	6.5	TheGoodNurse.webp	movie
 65	Алиса не может ждать (Сериал)	2022	Алиса — подросток, учителя устали вызывать в школу ее маму, а та не может понять, что происходит с ребенком. Алиса же узнала то, что от нее скрывали несколько лет: она скоро ослепнет. Еще немного — и наступит полная темнота.\r\n\r\nЧтобы успеть пожить по-настоящему, глупо тратить время на школу, решает Алиса. Лучше резко повзрослеть, заработать «легкие» деньги и уехать в красивый большой город. Но довольно скоро подростковые иллюзии разобьются о реальность, а мамина стратегия — делать вид, что все хорошо — ожидаемо приведет к противоположному результату.	7.1	Alicanemogetgdat.webp	series
 \.
 
@@ -1448,13 +1455,8 @@ COPY public.genres (id, name) FROM stdin;
 --
 
 COPY public.users (id, email, password_hash, created_at, last_login) FROM stdin;
-2	zainka1808@mail.ru	$2b$12$54fEKvnDRAiydXkKDBuLTuZ1gxTAwSFXKy6Vm2IRebYHyKAgk0m0G	2025-09-08 14:28:49.220732	2025-09-11 12:21:42.146827
-3	vsyizhhh@checkyourform.xyz	$2b$12$O0qb/VxoGVFcvQ4Yg87lYefmb0oVMmkAgtr/MFaSJKrOFIUWJd7KK	2026-03-16 18:02:07.225555	\N
-4	emegfeix@immenseignite.info	$2b$12$Zh.9dSsBmroo08K8aFGrpOZ7u7MycCRS5DZ46puImnjij4GYTkdpW	2026-04-05 10:09:28.601016	\N
-5	vuqjhnqh@immenseignite.info	$2b$12$T3BSRuhs7lOGEMczvUwpmO9x3DDkEHVjFPB6YBbwRfkO8M6uLV8eG	2026-04-07 07:34:03.166818	\N
-6	wpsgdhsy@immenseignite.info	$2b$12$RJoWcCa9oIwrSdjh89tck.4SPoL98q9uVq7UhEteGo1b8b1xmUlSa	2026-04-30 03:35:36.845994	\N
-7	ryancloud@mail.ru	$2b$12$URJ.KUrXnZwjMgrYcrjL4ucXugi8ZQJXXCFQL6LVLzdMIOww9Aqbu	2026-04-30 06:50:12.088851	\N
-1	spaceocean@outlook.com	$2b$12$KHf9cKrMtNXHCrQxNY2V6.4ryUVFgHiWOc.jG1J61Ckqduoy2lE9q	2025-09-08 12:14:40.453483	2026-07-16 04:32:06.5144
+9	zainka1808@mail.ru	$2b$12$zBJ53iI.wgElkD13oLqzqOSTuQhxgaxLi.SUmeOODE438c6RzvPkG	2026-07-16 14:33:30.138011	\N
+8	spacepythonworld@gmail.com	$2b$12$f.tdxjE6Oxl.G9O7uNMS2.ftj0MpMXD9n16ukwkXLuOGAT3v3.Bca	2026-07-16 07:22:58.052361	2026-07-30 07:10:36.438996
 \.
 
 
@@ -1469,7 +1471,7 @@ SELECT pg_catalog.setval('public.countries_id_seq', 39, true);
 -- Name: films_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.films_id_seq', 307, true);
+SELECT pg_catalog.setval('public.films_id_seq', 315, true);
 
 
 --
@@ -1483,7 +1485,7 @@ SELECT pg_catalog.setval('public.genres_id_seq', 1, false);
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 7, true);
+SELECT pg_catalog.setval('public.users_id_seq', 9, true);
 
 
 --
@@ -1609,5 +1611,5 @@ ALTER TABLE ONLY public.film_genre
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 0e4H88Gqhw5izwAWUuBvjIkKuG8GfPwEypXsGhwUNuyQCfhHjW9u7JsS6BdVWvQ
+\unrestrict FlDA3G7v0GJVi0EPAWQnCiJffzHkI0ivHgAYGHHROfMJrWnyvx5KzeFAb8AFiik
 
