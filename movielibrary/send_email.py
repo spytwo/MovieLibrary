@@ -5,9 +5,6 @@ import aiosmtplib
 
 from movielibrary.settings import settings
 
-sender_email = settings.email
-password = settings.email_app_password
-
 
 async def _send_base_email(to_email: str, subject: str, body: str) -> None:
     msg = MIMEText(body, "plain", "utf-8")
@@ -21,26 +18,35 @@ async def _send_base_email(to_email: str, subject: str, body: str) -> None:
         recipients=[to_email],
         hostname="smtp.yandex.ru",
         port=465,
-        username=sender_email,
-        password=password,
+        username=settings.email,
+        password=settings.email_app_password,
         use_tls=True,
     )
 
 
-async def send_movie_alert(movie_title: str):
-    receiver_emails = [
-        email.strip() for email in settings.receiver_emails.split(",") if email.strip()
-    ]
-    tasks = []
-    for email in receiver_emails:
-        text = f"Мы посмотрели новый фильм: {movie_title}"
-        tasks.append(_send_base_email(email, "Привет от FilmLibrary!", text))
+async def send_movie_alert(
+    receiver_emails: list[str],
+    movie_title: str,
+) -> None:
+    text = f"Мы посмотрели новый фильм: {movie_title}"
 
-    if tasks:
-        await asyncio.gather(*tasks, return_exceptions=True)
+    await asyncio.gather(
+        *[
+            _send_base_email(
+                email,
+                "Привет от FilmLibrary!",
+                text,
+            )
+            for email in receiver_emails
+        ],
+        return_exceptions=True,
+    )
 
 
-async def send_password_reset(receiver_email: str, new_password: str):
+async def send_password_reset(
+    receiver_email: str,
+    new_password: str,
+) -> None:
     text = f"""Здравствуйте!
 
 Ваш пароль на FilmLibrary был сброшен.
@@ -52,4 +58,8 @@ async def send_password_reset(receiver_email: str, new_password: str):
 С уважением,
 Команда FilmLibrary"""
 
-    await _send_base_email(receiver_email, "Восстановление пароля — FilmLibrary", text)
+    await _send_base_email(
+        receiver_email,
+        "Восстановление пароля — FilmLibrary",
+        text,
+    )

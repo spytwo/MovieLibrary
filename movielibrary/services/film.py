@@ -35,7 +35,6 @@ class FilmService:
         films = await self.repo.get_multi(**filters)
         return films_to_read(list(films))
 
-    @cache(expire=360, key_builder=key_builder)
     async def get_latest_films_for_index(self, limit: int = 5) -> list[FilmRead]:
         films = await self.repo.get_multi(limit=limit)
         return films_to_read(list(films))

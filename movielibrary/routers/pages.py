@@ -32,8 +32,9 @@ from movielibrary.repositories.country import CountryRepository
 from movielibrary.repositories.genre import GenreRepository
 from movielibrary.schemas.film import FilmCreate, FilmRead
 from movielibrary.schemas.user import UserCreate
-from movielibrary.send_email import send_movie_alert, send_password_reset
+from movielibrary.send_email import send_password_reset
 from movielibrary.services.film import FilmService
+from movielibrary.services.notification import NotificationService
 from movielibrary.settings import settings
 
 router = APIRouter()
@@ -520,5 +521,10 @@ async def create_film(
     film_service = FilmService(db)
     new_film = await film_service.create_new_film(film_schema, genres, countries)
 
-    background_tasks.add_task(send_movie_alert, new_film.title)
+    notification_service = NotificationService(db)
+
+    background_tasks.add_task(
+        notification_service.send_new_movie_notification,
+        new_film.title,
+    )
     return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
