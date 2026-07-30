@@ -1,6 +1,5 @@
 from contextlib import asynccontextmanager
 
-import uvicorn
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi_cache import FastAPICache
@@ -39,7 +38,3 @@ app.include_router(genres.router, prefix="/api/genres", tags=["Genres"])
 app.include_router(countries.router, prefix="/api/countries", tags=["Countries"])
 
 app.include_router(pages.router, tags=["Web Pages"], include_in_schema=False)
-
-
-if __name__ == "__main__":
-    uvicorn.run("movielibrary.main:app", host="0.0.0.0", port=8002, reload=True)
