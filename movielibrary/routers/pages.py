@@ -32,7 +32,7 @@ from movielibrary.repositories.country import CountryRepository
 from movielibrary.repositories.genre import GenreRepository
 from movielibrary.schemas.film import FilmCreate, FilmRead
 from movielibrary.schemas.user import UserCreate
-from movielibrary.send_email import send_password_reset
+from movielibrary.send_email import send_password_reset, send_welcome_email
 from movielibrary.services.film import FilmService
 from movielibrary.services.notification import NotificationService
 from movielibrary.settings import settings
@@ -77,6 +77,7 @@ async def register_form(request: Request):
 @router.post("/register", response_class=HTMLResponse, summary="Register")
 async def register(
     request: Request,
+    background_tasks: BackgroundTasks,
     email: str = Form(...),
     password: str = Form(..., min_length=6),
     confirm_password: str = Form(...),
@@ -105,6 +106,11 @@ async def register(
         raise HTTPException(
             status_code=500, detail="Ошибка при создании пользователя"
         ) from None
+
+    background_tasks.add_task(
+        send_welcome_email,
+        new_user.email,
+    )
 
     token = create_access_token(email=new_user.email)
     response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)

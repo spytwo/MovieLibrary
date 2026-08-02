@@ -63,3 +63,21 @@ async def send_password_reset(
         "Восстановление пароля — FilmLibrary",
         text,
     )
+
+
+async def send_welcome_email(receiver_email: str) -> None:
+    text = """Здравствуйте!
+
+Добро пожаловать в FilmLibrary! 🎬
+
+Ваш аккаунт успешно создан.
+
+С уважением,
+Команда FilmLibrary
+"""
+
+    await _send_base_email(
+        receiver_email,
+        "Добро пожаловать в FilmLibrary!",
+        text,
+    )
