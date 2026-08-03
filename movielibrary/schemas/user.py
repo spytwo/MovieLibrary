@@ -14,12 +14,3 @@ class UserCreate(BaseModel):
         if len(v) < 6:
             raise ValueError("Пароль должен содержать минимум 6 символов")
         return v
-
-
-class UserOut(BaseModel):
-    id: int
-    email: EmailStr
-    created_at: datetime
-    last_login: Optional[datetime] = None
-
-    model_config = ConfigDict(from_attributes=True)

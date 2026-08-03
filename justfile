@@ -18,3 +18,6 @@ logs:
 
 redis:
     docker exec -it movielibrary_redis redis-cli
+
+tests:
+    docker compose exec web pytest

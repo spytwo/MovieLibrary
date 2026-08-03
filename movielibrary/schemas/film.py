@@ -45,12 +45,3 @@ class FilmRead(FilmBase):
 class FilmCreate(FilmBase):
     photo: str
     type: MediaType
-
-
-class FilmSearchResult(BaseModel):
-    id: int
-    title: str
-    year: int
-    rating: float
-
-    model_config = ConfigDict(from_attributes=True)
