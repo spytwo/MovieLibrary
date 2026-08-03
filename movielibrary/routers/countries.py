@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from movielibrary.database import get_db
 from movielibrary.repositories.country import CountryRepository
 
-router = APIRouter(prefix="/countries", tags=["Countries"])
+router = APIRouter(tags=["Countries"])
 
 
 @router.get("", response_model=list[str], summary="List Countries")

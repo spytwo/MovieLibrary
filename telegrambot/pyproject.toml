@@ -2,7 +2,7 @@
 name = "telegrambot"
 version = "0.1.0"
 description = ""
-authors = ["spaceoceanoutlook <spaceocean@outlook.com>"]
+authors = ["Your Name <you@example.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]

@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional
 import aiohttp
 from aiogram import Bot, Dispatcher, F, types
 from aiogram.filters import Command
+from aiogram.filters.callback_data import CallbackData
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -19,133 +20,150 @@ bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
 
-async def fetch_json(session: aiohttp.ClientSession, url: str) -> Any:
-    async with session.get(url) as resp:
+class GenreCB(CallbackData, prefix="genre"):
+    name: str
+    page: int = 1
+
+
+class FilmCB(CallbackData, prefix="film"):
+    id: int | str
+
+
+async def fetch_json(
+    session: aiohttp.ClientSession, url: str, params: Optional[Dict[str, Any]] = None
+) -> Any:
+    async with session.get(url, params=params) as resp:
         resp.raise_for_status()
         return await resp.json()
 
 
 @dp.message(Command("search"))
 async def cmd_search(message: types.Message):
-    await message.answer("Film:")
+    await message.answer("Введите название фильма для поиска:")
 
 
 @dp.message(Command("genres"))
-async def cmd_genres(message: types.Message):
-    url = f"{API_BASE_URL}/api/filters/genres/"
-    async with aiohttp.ClientSession() as session:
-        try:
-            genres_data: List[str] = await fetch_json(session, url)
-        except Exception as e:
-            await message.answer(f"Couldn't get genres: {e}")
-            return
+async def cmd_genres(message: types.Message, http_session: aiohttp.ClientSession):
+    url = f"{API_BASE_URL}/api/genres/"
+    try:
+        genres_data: List[str] = await fetch_json(http_session, url)
+    except Exception as e:
+        await message.answer(f"Не удалось получить жанры: {e}")
+        return
 
     if not genres_data:
-        await message.answer("Genres not found")
+        await message.answer("Жанры не найдены")
         return
 
     buttons = [
-        [types.InlineKeyboardButton(text=genre, callback_data=f"genre_{genre}")]
+        [
+            types.InlineKeyboardButton(
+                text=genre, callback_data=GenreCB(name=genre, page=1).pack()
+            )
+        ]
         for genre in genres_data
     ]
     markup = types.InlineKeyboardMarkup(inline_keyboard=buttons)
+    await message.answer("Выберите жанр:", reply_markup=markup)
 
-    await message.answer("Choose a genre:", reply_markup=markup)
 
+@dp.callback_query(GenreCB.filter())
+async def handle_genre_callback(
+    call: types.CallbackQuery,
+    callback_data: GenreCB,
+    http_session: aiohttp.ClientSession,
+):
+    genre = callback_data.name
+    page = callback_data.page
+    page_size = 5
 
-@dp.callback_query(F.data.startswith("genre_"))
-async def handle_genre_callback(call: types.CallbackQuery):
-    data = call.data.replace("genre_", "")
+    url = f"{API_BASE_URL}/api/films"
+    params = {"genre": genre, "page": page, "page_size": page_size}
 
-    if "|" in data:
-        genre, offset_str = data.split("|", 1)
-        try:
-            offset = int(offset_str)
-        except ValueError:
-            offset = 0
-    else:
-        genre = data
-        offset = 0
-
-    url = f"{API_BASE_URL}/api/filters/genres/{genre}"
-    async with aiohttp.ClientSession() as session:
-        try:
-            films: List[Dict[str, Any]] = await fetch_json(session, url)
-        except Exception as e:
-            await call.message.answer(f"Couldn't get genre films {genre}: {e}")
-            await call.answer()
-            return
+    try:
+        films: List[Dict[str, Any]] = await fetch_json(http_session, url, params=params)
+    except Exception as e:
+        await call.message.answer(f"Не удалось получить фильмы жанра {genre}: {e}")
+        await call.answer()
+        return
 
     await call.answer()
 
-    if not films:
+    if not films and page == 1:
         await call.message.answer(
-            f"Movies of the genre *{genre}* not found", parse_mode="Markdown"
+            f"Фильмы жанра *{genre}* не найдены", parse_mode="Markdown"
         )
         return
 
-    if offset == 0:
+    if page == 1:
         await call.message.answer(
-            f"Movies of the genre *{genre}*:", parse_mode="Markdown"
+            f"Фильмы жанра *{genre}* (Страница {page}):", parse_mode="Markdown"
         )
 
-    films_slice = films[offset : offset + 5]
-
-    for film in films_slice:
-        title = film.get("title", "Untitled")
+    for film in films:
+        title = film.get("title", "Без названия")
         film_id = film.get("id")
 
         details_markup = types.InlineKeyboardMarkup(
             inline_keyboard=[
                 [
                     types.InlineKeyboardButton(
-                        text="More detailed", callback_data=f"film_{film_id}"
+                        text="Подробнее",
+                        callback_data=FilmCB(id=film_id).pack(),
                     )
                 ]
             ]
         )
         await call.message.answer(f"🎬 {title}", reply_markup=details_markup)
 
-    next_offset = offset + 5
-    if next_offset < len(films):
+    if len(films) == page_size:
         more_markup = types.InlineKeyboardMarkup(
             inline_keyboard=[
                 [
                     types.InlineKeyboardButton(
-                        text="More", callback_data=f"genre_{genre}|{next_offset}"
+                        text="Ещё 🍿",
+                        callback_data=GenreCB(name=genre, page=page + 1).pack(),
                     )
                 ]
             ]
         )
-        await call.message.answer("🍿", reply_markup=more_markup)
+        await call.message.answer(
+            "Загрузить следующие фильмы:", reply_markup=more_markup
+        )
 
 
 @dp.message(F.text & ~F.via_bot)
-async def handle_text(message: types.Message):
+async def handle_text(message: types.Message, http_session: aiohttp.ClientSession):
     query = (message.text or "").strip()
     if not query:
         return
 
-    url = f"{API_BASE_URL}/api/films/search?q={query}"
-    async with aiohttp.ClientSession() as session:
-        try:
-            films: List[Dict[str, Any]] = await fetch_json(session, url)
-        except Exception as e:
-            await message.answer(f"Couldn't complete the search: {e}")
-            return
+    if len(query) < 3:
+        await message.answer("Запрос должен содержать минимум 3 символа.")
+        return
+
+    url = f"{API_BASE_URL}/api/films"
+    try:
+        films: List[Dict[str, Any]] = await fetch_json(
+            http_session, url, params={"q": query}
+        )
+    except Exception as e:
+        await message.answer(f"Не удалось выполнить поиск: {e}")
+        return
 
     if not films:
-        await message.answer("Nothing was found")
+        await message.answer("Ничего не найдено")
         return
 
     for film in films:
-        title = film.get("title", "Untitled")
+        title = film.get("title", "Без названия")
         film_id = film.get("id")
         markup = types.InlineKeyboardMarkup(
             inline_keyboard=[
                 [
                     types.InlineKeyboardButton(
-                        text="More detailed", callback_data=f"film_{film_id}"
+                        text="Подробнее",
+                        callback_data=FilmCB(id=film_id).pack(),
                     )
                 ]
             ]
@@ -153,29 +171,32 @@ async def handle_text(message: types.Message):
         await message.answer(f"🎬 {title}", reply_markup=markup)
 
 
-@dp.callback_query(F.data.startswith("film_"))
-async def handle_film_details(call: types.CallbackQuery):
-    film_id = call.data.split("_", 1)[1]
+@dp.callback_query(FilmCB.filter())
+async def handle_film_details(
+    call: types.CallbackQuery,
+    callback_data: FilmCB,
+    http_session: aiohttp.ClientSession,
+):
+    film_id = callback_data.id
     url = f"{API_BASE_URL}/api/films/{film_id}"
 
-    async with aiohttp.ClientSession() as session:
-        try:
-            film_data: Dict[str, Optional[Any]] = await fetch_json(session, url)
-        except Exception as e:
-            await call.message.answer(f"Couldn't get information about the movie: {e}")
-            await call.answer()
-            return
+    try:
+        film_data: Dict[str, Optional[Any]] = await fetch_json(http_session, url)
+    except Exception as e:
+        await call.message.answer(f"Не удалось получить информацию о фильме: {e}")
+        await call.answer()
+        return
 
-    title = film_data.get("title") or "Untitled"
+    title = film_data.get("title") or "Без названия"
     year = film_data.get("year") or "—"
     rating = film_data.get("rating") or "—"
-    description = film_data.get("description") or "The description is missing"
+    description = film_data.get("description") or "Описание отсутствует"
 
     message_text = (
         f"🎞 <b>{title}</b>\n\n"
-        f"🗓️ Year: {year}\n"
-        f"🌟 Rating: {rating}\n"
-        f"📖 Description: {description}"
+        f"🗓️ Год: {year}\n"
+        f"🌟 Рейтинг: {rating}\n"
+        f"📖 Описание: {description}"
     )
 
     await call.message.answer(message_text, parse_mode="HTML")
@@ -183,7 +204,9 @@ async def handle_film_details(call: types.CallbackQuery):
 
 
 async def main():
-    await dp.start_polling(bot)
+    async with aiohttp.ClientSession() as session:
+        dp["http_session"] = session
+        await dp.start_polling(bot)
 
 
 if __name__ == "__main__":

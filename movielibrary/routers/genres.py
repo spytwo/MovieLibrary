@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from movielibrary.database import get_db
 from movielibrary.repositories.genre import GenreRepository
 
-router = APIRouter(prefix="/genres", tags=["Genres"])
+router = APIRouter(tags=["Genres"])
 
 
 @router.get("", response_model=list[str], summary="List Genres")

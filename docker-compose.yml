@@ -36,12 +36,11 @@ services:
       timeout: 3s
       retries: 5
 
-  # bot:
-  #   build:
-  #     context: ./telegrambot
-  #   container_name: movielibrary_bot
-  #   env_file: .env
-  #   restart: always
+  bot:
+    build:
+      context: ./telegrambot
+    container_name: movielibrary_bot
+    env_file: .env
 
 volumes:
   postgres_data:
