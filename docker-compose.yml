@@ -36,11 +36,12 @@ services:
       timeout: 3s
       retries: 5
 
-  bot:
-    build:
-      context: ./telegrambot
-    container_name: movielibrary_bot
-    env_file: .env
+# На 04.08.2026 в моей системе работает только через амнезию при включенном туннелировании 
+#   bot:
+#     build:
+#       context: ./telegrambot
+#     container_name: movielibrary_bot
+#     env_file: .env
 
 volumes:
   postgres_data:
