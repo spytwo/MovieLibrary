@@ -135,7 +135,7 @@ def generate_temporary_password(length: int = 12) -> str:
 def generate_csrf_token() -> str:
     token = secrets.token_urlsafe(32)
     signature = hmac.new(
-        settings.secret_key.encode(),
+        SECRET_KEY.encode(),
         token.encode(),
         hashlib.sha256,
     ).hexdigest()
@@ -152,7 +152,9 @@ def get_or_create_csrf_token(request: Request) -> str:
     return generate_csrf_token()
 
 
-def validate_csrf_token(token: str) -> bool:
+def validate_csrf_token(token: Optional[str]) -> bool:
+    if not token:
+        return False
     try:
         value, signature = token.rsplit(".", 1)
     except ValueError:
@@ -177,7 +179,7 @@ def set_csrf_cookie(
         httponly=False,
         secure=False,  # True в production при HTTPS
         samesite="lax",
-        max_age=int(settings.access_token_expire_minutes) * MINUTE_IN_SECONDS,
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * MINUTE_IN_SECONDS,
         path="/",
     )
 
@@ -185,13 +187,17 @@ def set_csrf_cookie(
 def verify_csrf_token(request: Request, csrf_token: str) -> None:
     cookie_token = request.cookies.get("csrf_token")
 
-    if not cookie_token or not validate_csrf_token(csrf_token):
+    if not cookie_token:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid CSRF token",
         )
 
-    if not hmac.compare_digest(cookie_token, csrf_token):
+    if (
+        not validate_csrf_token(cookie_token)
+        or not validate_csrf_token(csrf_token)
+        or not hmac.compare_digest(cookie_token, csrf_token)
+    ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid CSRF token",
