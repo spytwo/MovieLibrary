@@ -76,6 +76,11 @@
     <body>
         <h1>Добавить новый фильм</h1>
         <form action="/create" method="post" enctype="multipart/form-data">
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token }}"
+            />
             <div class="form-group">
                 <label for="title"">Название фильма</label>
                 <input type="text" id="title" name="title" required />

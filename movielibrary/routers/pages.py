@@ -21,8 +21,11 @@ from movielibrary.auth_utils import (
     generate_temporary_password,
     get_current_user_optional,
     get_current_user_required,
+    get_or_create_csrf_token,
     get_password_hash,
     get_user_by_email,
+    set_csrf_cookie,
+    verify_csrf_token,
     verify_password,
 )
 from movielibrary.database import get_db
@@ -71,7 +74,19 @@ async def read_films(
 
 @router.get("/register", response_class=HTMLResponse, summary="Register Form")
 async def register_form(request: Request):
-    return templates.TemplateResponse("register.html", {"request": request})
+    csrf_token = get_or_create_csrf_token(request)
+
+    response = templates.TemplateResponse(
+        "register.html",
+        {
+            "request": request,
+            "csrf_token": csrf_token,
+        },
+    )
+
+    set_csrf_cookie(response, csrf_token)
+
+    return response
 
 
 @router.post("/register", response_class=HTMLResponse, summary="Register")
@@ -81,8 +96,11 @@ async def register(
     email: str = Form(...),
     password: str = Form(..., min_length=6),
     confirm_password: str = Form(...),
+    csrf_token: str = Form(...),
     db: AsyncSession = Depends(get_db),
 ):
+    verify_csrf_token(request, csrf_token)
+
     if password != confirm_password:
         raise HTTPException(status_code=400, detail="Пароли не совпадают")
 
@@ -126,19 +144,33 @@ async def register(
     return response
 
 
-@router.get(
-    "/forgot_password", response_class=HTMLResponse, summary="Forgot Password Form"
-)
+@router.get("/forgot_password", response_class=HTMLResponse)
 async def forgot_password_form(request: Request):
-    return templates.TemplateResponse("forgot_password.html", {"request": request})
+    csrf_token = get_or_create_csrf_token(request)
+
+    response = templates.TemplateResponse(
+        "forgot_password.html",
+        {
+            "request": request,
+            "csrf_token": csrf_token,
+        },
+    )
+
+    set_csrf_cookie(response, csrf_token)
+
+    return response
 
 
 @router.post("/forgot_password", summary="Forgot Password")
 async def forgot_password(
+    request: Request,
     background_tasks: BackgroundTasks,
     email: str = Form(...),
+    csrf_token: str = Form(...),
     db: AsyncSession = Depends(get_db),
 ):
+    verify_csrf_token(request, csrf_token)
+
     user = await get_user_by_email(db, email)
 
     if not user:
@@ -155,7 +187,19 @@ async def forgot_password(
 
 @router.get("/login", response_class=HTMLResponse, summary="Login Form")
 async def login_form(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+    csrf_token = get_or_create_csrf_token(request)
+
+    response = templates.TemplateResponse(
+        "login.html",
+        {
+            "request": request,
+            "csrf_token": csrf_token,
+        },
+    )
+
+    set_csrf_cookie(response, csrf_token)
+
+    return response
 
 
 @router.post("/login", response_class=HTMLResponse, summary="Login")
@@ -163,8 +207,11 @@ async def login(
     request: Request,
     email: str = Form(...),
     password: str = Form(...),
+    csrf_token: str = Form(...),
     db: AsyncSession = Depends(get_db),
 ):
+    verify_csrf_token(request, csrf_token)
+
     user = await get_user_by_email(db, email)
     if not user:
         raise HTTPException(status_code=400, detail="Пользователя не существует")
@@ -193,13 +240,20 @@ async def account(
     request: Request,
     current_user: Optional[User] = Depends(get_current_user_optional),
 ):
-    return templates.TemplateResponse(
+    csrf_token = get_or_create_csrf_token(request)
+
+    response = templates.TemplateResponse(
         "account.html",
         {
             "request": request,
             "user_email": current_user.email if current_user else None,
+            "csrf_token": csrf_token,
         },
     )
+
+    set_csrf_cookie(response, csrf_token)
+
+    return response
 
 
 @router.post(
@@ -211,8 +265,11 @@ async def change_password(
     new_password: str = Form(..., min_length=6),
     confirm_password: str = Form(...),
     db: AsyncSession = Depends(get_db),
+    csrf_token: str = Form(...),
     current_user: User = Depends(get_current_user_required),
 ):
+    verify_csrf_token(request, csrf_token)
+
     if new_password != confirm_password:
         raise HTTPException(status_code=400, detail="Пароли не совпадают")
     if not verify_password(old_password, current_user.password_hash):
@@ -222,20 +279,38 @@ async def change_password(
     db.add(current_user)
     await db.commit()
 
-    return templates.TemplateResponse(
+    csrf_token = get_or_create_csrf_token(request)
+
+    response = templates.TemplateResponse(
         "account.html",
         {
             "request": request,
             "user_email": current_user.email,
             "message": "Пароль успешно изменён",
+            "csrf_token": csrf_token,
         },
     )
 
+    set_csrf_cookie(response, csrf_token)
 
-@router.get("/logout")
-async def logout():
-    response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    return response
+
+
+@router.post("/logout", summary="Logout")
+async def logout(
+    request: Request,
+    csrf_token: str = Form(...),
+):
+    verify_csrf_token(request, csrf_token)
+
+    response = RedirectResponse(
+        url="/",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
     response.delete_cookie("access_token", path="/")
+    response.delete_cookie("csrf_token", path="/")
+
     return response
 
 
@@ -476,19 +551,27 @@ async def show_create_film_form(
     genre_list = await genre_repo.get_all()
     country_list = await country_repo.get_all()
 
-    return templates.TemplateResponse(
+    csrf_token = get_or_create_csrf_token(request)
+
+    response = templates.TemplateResponse(
         "create.html",
         {
             "request": request,
             "genre_list": genre_list,
             "country_list": country_list,
             "user_email": current_user.email,
+            "csrf_token": csrf_token,
         },
     )
+
+    set_csrf_cookie(response, csrf_token)
+
+    return response
 
 
 @router.post("/create", summary="Create Film")
 async def create_film(
+    request: Request,
     background_tasks: BackgroundTasks,
     title: str = Form(..., min_length=1),
     year: int = Form(..., ge=1895),
@@ -499,9 +582,12 @@ async def create_film(
     genres: List[int] = Form([]),
     countries: List[int] = Form([]),
     type: str = Form(...),
+    csrf_token: str = Form(...),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user_required),
 ):
+    verify_csrf_token(request, csrf_token)
+
     if code != settings.valid_code:
         raise HTTPException(status_code=400, detail="Неверный код доступа")
 
