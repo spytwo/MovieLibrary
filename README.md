@@ -1,7 +1,7 @@
 ## Запуск проекта MovieLibrary
 Клонирование репозитория
 ```bash
-git clone https://github.com/Spaceoceanoutlook/MovieLibrary.git
+git clone https://github.com/spytwo/MovieLibrary.git
 ```
 Открыть проект в редакторе, в корне проекта создать файл `.env` и дополнить переменные окружения
 ```bash
