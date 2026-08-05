@@ -3,8 +3,11 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
         <title>Добавить новый фильм</title>
-        <link rel="icon" href="{{ cdn }}favicon.png" type="image/png">
+
+        <link rel="icon" href="{{ cdn }}favicon.png" type="image/png" />
+
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -13,19 +16,28 @@
                 padding: 20px;
                 line-height: 1.6;
             }
+
             h1 {
                 color: #333;
                 text-align: center;
                 margin-bottom: 20px;
             }
+
             .form-group {
                 margin-bottom: 20px;
             }
+
             label {
                 display: block;
                 margin-bottom: 8px;
                 font-weight: bold;
             }
+
+            .required::after {
+                content: " *";
+                color: red;
+            }
+
             input[type="text"],
             input[type="number"],
             input[type="file"],
@@ -38,13 +50,16 @@
                 box-sizing: border-box;
                 font-size: 16px;
             }
+
             textarea {
                 height: 120px;
                 resize: vertical;
             }
+
             .multi-select {
                 height: 150px;
             }
+
             button {
                 background-color: #4caf50;
                 color: white;
@@ -56,16 +71,15 @@
                 width: 100%;
                 transition: background-color 0.3s;
             }
+
             button:hover {
                 background-color: #45a049;
             }
-            .required:after {
-                content: " *";
-                color: red;
-            }
+
             .file-upload {
                 margin-top: 10px;
             }
+
             .form-note {
                 font-size: 14px;
                 color: #666;
@@ -73,20 +87,37 @@
             }
         </style>
     </head>
+
     <body>
         <h1>Добавить новый фильм</h1>
+
         <form action="/create" method="post" enctype="multipart/form-data">
             <input
                 type="hidden"
                 name="csrf_token"
                 value="{{ csrf_token }}"
             />
+
+            <!-- Название -->
             <div class="form-group">
-                <label for="title"">Название фильма</label>
-                <input type="text" id="title" name="title" required />
+                <label for="title" class="required">
+                    Название фильма
+                </label>
+
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    required
+                />
             </div>
+
+            <!-- Год -->
             <div class="form-group">
-                <label for="year"">Год выпуска</label>
+                <label for="year" class="required">
+                    Год выпуска
+                </label>
+
                 <input
                     type="number"
                     id="year"
@@ -96,35 +127,88 @@
                     required
                 />
             </div>
+
+            <!-- Описание -->
             <div class="form-group">
-                <label for="description">Описание</label>
-                <textarea id="description" name="description"></textarea>
+                <label for="description">
+                    Описание
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                ></textarea>
             </div>
+
+            <!-- Рейтинг -->
             <div class="form-group">
-                <label for="rating"">Рейтинг</label>
-                <input type="number" id="rating" name="rating" step="0.1" min="0" max="10" required />
+                <label for="rating" class="required">
+                    Рейтинг
+                </label>
+
+                <input
+                    type="number"
+                    id="rating"
+                    name="rating"
+                    step="0.1"
+                    min="0"
+                    max="10"
+                    required
+                />
             </div>
+
+            <!-- Постер -->
             <div class="form-group">
-                <label for="photo">Название постера</label>
-                <input type="text" id="photo" name="photo" required />
+                <label for="photo" class="required">
+                    Название постера
+                </label>
+
+                <input
+                    type="text"
+                    id="photo"
+                    name="photo"
+                    required
+                />
             </div>
+
+            <!-- Тип контента -->
             <div class="form-group">
-                <label for="type">Тип контента</label>
+                <label for="type" class="required">
+                    Тип контента
+                </label>
+
                 <select id="type" name="type" required>
                     <option value="movie">Фильм</option>
                     <option value="series">Сериал</option>
                 </select>
             </div>
+
+            <!-- Жанры -->
             <div class="form-group">
-                <label for="genres">Жанры</label>
-                <select id="genres" name="genres" multiple class="multi-select">
+                <label for="genres">
+                    Жанры
+                </label>
+
+                <select
+                    id="genres"
+                    name="genres"
+                    multiple
+                    class="multi-select"
+                >
                     {% for genre in genre_list %}
-                    <option value="{{ genre.id }}">{{ genre.name }}</option>
+                    <option value="{{ genre.id }}">
+                        {{ genre.name }}
+                    </option>
                     {% endfor %}
                 </select>
             </div>
+
+            <!-- Страны -->
             <div class="form-group">
-                <label for="countries">Страны</label>
+                <label for="countries">
+                    Страны
+                </label>
+
                 <select
                     id="countries"
                     name="countries"
@@ -132,16 +216,32 @@
                     class="multi-select"
                 >
                     {% for country in country_list %}
-                    <option value="{{ country.id }}">{{ country.name }}</option>
+                    <option value="{{ country.id }}">
+                        {{ country.name }}
+                    </option>
                     {% endfor %}
                 </select>
             </div>
+
+            <!-- Код -->
             <div class="form-group">
-                <label for="code">Код</label>
-                <input type="text" id="code" name="code" required />
+                <label for="code" class="required">
+                    Код
+                </label>
+
+                <input
+                    type="text"
+                    id="code"
+                    name="code"
+                    required
+                />
             </div>
+
+            <!-- Кнопка -->
             <div class="form-group">
-                <button type="submit">Добавить фильм</button>
+                <button type="submit">
+                    Добавить фильм
+                </button>
             </div>
         </form>
     </body>
