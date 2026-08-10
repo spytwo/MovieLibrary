@@ -1,39 +1,40 @@
-[tool.poetry]
+[project]
 name = "movielibrary"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
 readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.14,<0.116.0",
+    "uvicorn>=0.35.0,<0.36.0",
+    "sqlalchemy>=2.0.41,<3.0.0",
+    "alembic>=1.16.2,<2.0.0",
+    "jinja2>=3.1.6,<4.0.0",
+    "python-multipart>=0.0.20,<0.0.21",
+    "asyncpg>=0.30.0",
+    "aiosmtplib>=4.0.1",
+    "psycopg2-binary>=2.9.10",
+    "pydantic>=2.11.7",
+    "email-validator>=2.3.0",
+    "itsdangerous>=2.2.0",
+    "pydantic-settings>=2.11.0",
+    "redis>=8.0.1",
+    "fastapi-cache2>=0.2.2",
+    "pwdlib[argon2]>=0.3.0",
+    "pyjwt>=2.13.0",
+]
 
-[tool.poetry.dependencies]
-python = ">=3.12, <3.14"
-fastapi = ">=0.115.14,<0.116.0"
-uvicorn = ">=0.35.0,<0.36.0"
-sqlalchemy = ">=2.0.41,<3.0.0"
-alembic = ">=1.16.2,<2.0.0"
-jinja2 = ">=3.1.6,<4.0.0"
-python-multipart = ">=0.0.20,<0.0.21"
-asyncpg = "^0.30.0"
-aiosmtplib = "^4.0.1"
-psycopg2-binary = "^2.9.10"
-pydantic = "^2.11.7"
-email-validator = "^2.3.0"
-itsdangerous = "^2.2.0"
-pydantic-settings = "^2.11.0"
-redis = "^8.0.1"
-fastapi-cache2 = "^0.2.2"
-pwdlib = {extras = ["argon2"], version = "^0.3.0"}
-pyjwt = "^2.13.0"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.4.2"
-pytest-asyncio = "^1.1.0"
-httpx = "^0.28.1"
-aiosqlite = "^0.21.0"
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.1.0",
+    "httpx>=0.28.1",
+    "aiosqlite>=0.21.0",
+]
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
