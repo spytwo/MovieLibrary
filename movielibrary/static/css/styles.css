@@ -473,6 +473,16 @@ main {
     margin: 0;
 }
 
+.error-alert {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    padding: 10px 12px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
 @media (max-width: 700px) {
     .film-card {
         flex-direction: column;

@@ -6,28 +6,29 @@
         <title>Личный кабинет</title>
         <link rel="stylesheet" href="/static/css/styles.css" />
         <script>
-    function showPopup(message) {
-      const popup = document.getElementById('popup-message');
-      const text = document.getElementById('popup-text');
-      text.textContent = message;
-      popup.style.display = 'block';
-      setTimeout(() => {
-        popup.style.display = 'none';
-      }, 3000);
-    }
-    function hidePopup() {
-      document.getElementById('popup-message').style.display = 'none';
-    }
+            function showPopup(message) {
+                const popup = document.getElementById('popup-message');
+                const text = document.getElementById('popup-text');
+                text.textContent = message;
+                popup.style.display = 'block';
+                setTimeout(() => {
+                    popup.style.display = 'none';
+                }, 4000);
+            }
 
-    document.addEventListener("DOMContentLoaded", function() {
-        
-      const serverMessage = "{{ message or '' }}";
-      
-      if (serverMessage) {
-        showPopup(serverMessage);
-      }
-    });
-</script>
+            function hidePopup() {
+                document.getElementById('popup-message').style.display = 'none';
+            }
+
+            document.addEventListener("DOMContentLoaded", function() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const serverMessage = "{{ message or '' }}" || urlParams.get('message');
+                
+                if (serverMessage) {
+                    showPopup(serverMessage);
+                }
+            });
+        </script>
     </head>
     <body>
         <header>
@@ -39,19 +40,26 @@
         <main>
             <div class="account-container">
                 <h2>Личный кабинет</h2>
+                
                 <div class="account-info">
                     <p><strong>Ваш email:</strong> {{ user_email }}</p>
                 </div>
 
                 <div class="account-section">
                     <h3>Сменить пароль</h3>
+
+                    {% if request.query_params.get('error') %}
+                    <div class="error-alert">
+                        {{ request.query_params.get('error') }}
+                    </div>
+                    {% endif %}
+
                     <form
                         method="post"
                         action="/account/change_password"
                         class="account-form"
                         autocomplete="off"
                     >
-
                         <input
                             type="hidden"
                             name="csrf_token"
@@ -81,10 +89,6 @@
                         />
                         <button type="submit">Изменить</button>
                     </form>
-                    <div id="popup-message" class="popup" style="display: none">
-                        <span id="popup-text"></span>
-                        <button onclick="hidePopup()">Закрыть</button>
-                    </div>
                 </div>
 
                 <div class="account-section">
@@ -100,6 +104,11 @@
                         </button>
                     </form>
                 </div>
+            </div>
+
+            <div id="popup-message" class="popup" style="display: none">
+                <span id="popup-text"></span>
+                <button onclick="hidePopup()">Закрыть</button>
             </div>
         </main>
     </body>

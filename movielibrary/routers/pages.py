@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from typing import List, Optional
+from urllib.parse import quote
 
 from fastapi import (
     APIRouter,
@@ -94,24 +95,33 @@ async def register(
     request: Request,
     background_tasks: BackgroundTasks,
     email: str = Form(...),
-    password: str = Form(..., min_length=6),
+    password: str = Form(...),
     confirm_password: str = Form(...),
     csrf_token: str = Form(...),
     db: AsyncSession = Depends(get_db),
 ):
     verify_csrf_token(request, csrf_token)
 
+    if len(password) < 6:
+        raise HTTPException(
+            status_code=400, detail="Пароль должен содержать минимум 6 символов"
+        )
+
     if password != confirm_password:
         raise HTTPException(status_code=400, detail="Пароли не совпадают")
 
     try:
         user_schema = UserCreate(email=email, password=password)
-    except ValidationError as e:
-        raise HTTPException(status_code=422, detail=e.errors()) from None
+    except ValidationError:
+        raise HTTPException(
+            status_code=400, detail="Некорректный email или пароль"
+        ) from None
 
     existing_user = await get_user_by_email(db, user_schema.email)
     if existing_user:
-        raise HTTPException(status_code=400, detail="Пользователь уже существует")
+        raise HTTPException(
+            status_code=400, detail="Пользователь с таким email уже существует"
+        )
 
     hashed_password = get_password_hash(user_schema.password)
     new_user = User(email=user_schema.email, password_hash=hashed_password)
@@ -173,16 +183,16 @@ async def forgot_password(
 
     user = await get_user_by_email(db, email)
 
-    if not user:
-        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    if user:
+        new_password = generate_temporary_password()
+        user.password_hash = get_password_hash(new_password)
+        await db.commit()
+        background_tasks.add_task(send_password_reset, email, new_password)
 
-    new_password = generate_temporary_password()
-    user.password_hash = get_password_hash(new_password)
-    await db.commit()
-
-    background_tasks.add_task(send_password_reset, email, new_password)
-
-    return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
+    msg = quote("Если email существует, новый пароль отправлен на почту")
+    return RedirectResponse(
+        url=f"/login?message={msg}", status_code=status.HTTP_302_FOUND
+    )
 
 
 @router.get("/login", response_class=HTMLResponse, summary="Login Form")
@@ -213,10 +223,9 @@ async def login(
     verify_csrf_token(request, csrf_token)
 
     user = await get_user_by_email(db, email)
-    if not user:
-        raise HTTPException(status_code=400, detail="Пользователя не существует")
-    if not verify_password(password, user.password_hash):
-        raise HTTPException(status_code=400, detail="Неправильный пароль")
+
+    if not user or not verify_password(password, user.password_hash):
+        raise HTTPException(status_code=400, detail="Неверный email или пароль")
 
     user.last_login = datetime.now(timezone.utc).replace(tzinfo=None)
     await db.commit()
@@ -262,7 +271,7 @@ async def account(
 async def change_password(
     request: Request,
     old_password: str = Form(...),
-    new_password: str = Form(..., min_length=6),
+    new_password: str = Form(...),
     confirm_password: str = Form(...),
     db: AsyncSession = Depends(get_db),
     csrf_token: str = Form(...),
@@ -270,30 +279,26 @@ async def change_password(
 ):
     verify_csrf_token(request, csrf_token)
 
+    if len(new_password) < 6:
+        raise HTTPException(
+            status_code=400, detail="Новый пароль должен содержать минимум 6 символов"
+        )
+
     if new_password != confirm_password:
-        raise HTTPException(status_code=400, detail="Пароли не совпадают")
+        raise HTTPException(status_code=400, detail="Новые пароли не совпадают")
+
     if not verify_password(old_password, current_user.password_hash):
-        raise HTTPException(status_code=400, detail="Неверный старый пароль")
+        raise HTTPException(status_code=400, detail="Неверный текущий пароль")
 
     current_user.password_hash = get_password_hash(new_password)
     db.add(current_user)
     await db.commit()
 
-    csrf_token = get_or_create_csrf_token(request)
-
-    response = templates.TemplateResponse(
-        "account.html",
-        {
-            "request": request,
-            "user_email": current_user.email,
-            "message": "Пароль успешно изменён",
-            "csrf_token": csrf_token,
-        },
+    success_msg = quote("Пароль успешно изменён")
+    return RedirectResponse(
+        url=f"/account?message={success_msg}",
+        status_code=status.HTTP_303_SEE_OTHER,
     )
-
-    set_csrf_cookie(response, csrf_token)
-
-    return response
 
 
 @router.post("/logout", summary="Logout")
@@ -607,8 +612,10 @@ async def create_film(
             photo=photo,
             type=media_type,
         )
-    except ValidationError as e:
-        raise HTTPException(status_code=422, detail=e.errors()) from None
+    except ValidationError:
+        raise HTTPException(
+            status_code=400, detail="Ошибка заполнения полей формы"
+        ) from None
 
     film_service = FilmService(db)
     new_film = await film_service.create_new_film(film_schema, genres, countries)
