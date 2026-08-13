@@ -7,7 +7,7 @@ from movielibrary.models.enums import MediaType
 from movielibrary.schemas.film import FilmBase, FilmCreate, FilmRead
 
 
-@pytest.mark.parametrize("rating", [0, 5, 8.5, 10])
+@pytest.mark.parametrize("rating", [0, 6, 8.5, 10])
 def test_film_rating_accepts_valid_values(rating):
     film = FilmBase(
         title="Test Film",
