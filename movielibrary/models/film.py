@@ -4,8 +4,8 @@ from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import Float, Index, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .associations import FilmCountry, FilmGenre
-from .base import Base
+from movielibrary.models.associations import FilmCountry, FilmGenre
+from movielibrary.models.base import Base
 
 
 class Film(Base):

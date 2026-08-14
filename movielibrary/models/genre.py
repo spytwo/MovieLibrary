@@ -3,8 +3,8 @@ from typing import List
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .associations import FilmGenre
-from .base import Base
+from movielibrary.models.associations import FilmGenre
+from movielibrary.models.base import Base
 
 
 class Genre(Base):

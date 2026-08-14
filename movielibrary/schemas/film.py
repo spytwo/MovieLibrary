@@ -4,9 +4,8 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict, field_validator
 
 from movielibrary.models.enums import MediaType
-
-from .country import CountryRead
-from .genre import GenreRead
+from movielibrary.schemas.country import CountryRead
+from movielibrary.schemas.genre import GenreRead
 
 
 class FilmBase(BaseModel):
