@@ -39,9 +39,9 @@ async def show_create_film_form(
 
     csrf_token = get_or_create_csrf_token(request)
     response = templates.TemplateResponse(
+        request,
         "create.html",
         {
-            "request": request,
             "genre_list": genre_list,
             "country_list": country_list,
             "user_email": current_user.email,

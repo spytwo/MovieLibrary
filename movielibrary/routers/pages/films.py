@@ -29,9 +29,9 @@ async def read_films(
     genres_for_template = await genre_repo.get_all()
 
     return templates.TemplateResponse(
+        request,
         "index.html",
         {
-            "request": request,
             "films": films,
             "genres": genres_for_template,
             "page": 1,
@@ -58,9 +58,9 @@ async def list_series(
     genres_for_template = await genre_repo.get_all()
 
     return templates.TemplateResponse(
+        request,
         "index.html",
         {
-            "request": request,
             "films": films,
             "genres": genres_for_template,
             "page": page,
@@ -88,9 +88,9 @@ async def search_films(
     genres_for_template = await genre_repo.get_all()
 
     return templates.TemplateResponse(
+        request,
         "index.html",
         {
-            "request": request,
             "films": films,
             "genres": genres_for_template,
             "page": page,
@@ -119,9 +119,9 @@ async def read_films_by_rating_page(
     genres_for_template = await genre_repo.get_all()
 
     return templates.TemplateResponse(
+        request,
         "index.html",
         {
-            "request": request,
             "films": films,
             "genres": genres_for_template,
             "page": page,
@@ -149,9 +149,9 @@ async def read_films_by_genre(
     genres_for_template = await genre_repo.get_all()
 
     return templates.TemplateResponse(
+        request,
         "index.html",
         {
-            "request": request,
             "films": films,
             "genres": genres_for_template,
             "page": page,
@@ -179,9 +179,9 @@ async def read_films_by_country(
     genres_for_template = await genre_repo.get_all()
 
     return templates.TemplateResponse(
+        request,
         "index.html",
         {
-            "request": request,
             "films": films,
             "genres": genres_for_template,
             "page": page,
@@ -209,9 +209,9 @@ async def read_films_by_year(
     genres_for_template = await genre_repo.get_all()
 
     return templates.TemplateResponse(
+        request,
         "index.html",
         {
-            "request": request,
             "films": films,
             "genres": genres_for_template,
             "page": page,
@@ -237,9 +237,9 @@ async def read_film(
     genres_for_template = await genre_repo.get_all()
 
     return templates.TemplateResponse(
+        request,
         "film_details.html",
         {
-            "request": request,
             "film": film_schema,
             "genres": genres_for_template,
             "page_title": film_schema.title,

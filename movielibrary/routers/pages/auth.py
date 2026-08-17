@@ -43,7 +43,7 @@ MINUTE_IN_SECONDS = 60
 async def register_form(request: Request):
     csrf_token = get_or_create_csrf_token(request)
     response = templates.TemplateResponse(
-        "register.html", {"request": request, "csrf_token": csrf_token}
+        request, "register.html", {"csrf_token": csrf_token}
     )
     set_csrf_cookie(response, csrf_token)
     return response
@@ -111,7 +111,7 @@ async def register(
 async def login_form(request: Request):
     csrf_token = get_or_create_csrf_token(request)
     response = templates.TemplateResponse(
-        "login.html", {"request": request, "csrf_token": csrf_token}
+        request, "login.html", {"csrf_token": csrf_token}
     )
     set_csrf_cookie(response, csrf_token)
     return response
@@ -151,7 +151,7 @@ async def login(
 async def forgot_password_form(request: Request):
     csrf_token = get_or_create_csrf_token(request)
     response = templates.TemplateResponse(
-        "forgot_password.html", {"request": request, "csrf_token": csrf_token}
+        request, "forgot_password.html", {"csrf_token": csrf_token}
     )
     set_csrf_cookie(response, csrf_token)
     return response
@@ -186,9 +186,9 @@ async def account(
 ):
     csrf_token = get_or_create_csrf_token(request)
     response = templates.TemplateResponse(
+        request,
         "account.html",
         {
-            "request": request,
             "user_email": current_user.email if current_user else None,
             "csrf_token": csrf_token,
         },
