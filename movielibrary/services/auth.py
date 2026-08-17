@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -42,7 +42,7 @@ class AuthService:
         if not verify_password(password, user.password_hash):
             raise HTTPException(status_code=400, detail="Неправильный пароль")
 
-        user.last_login = datetime.utcnow()
+        user.last_login = datetime.now(UTC)
         await self.db.commit()
         return user
 

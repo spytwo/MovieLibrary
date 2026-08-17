@@ -1,4 +1,7 @@
+import pytest
 import pytest_asyncio
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.inmemory import InMemoryBackend
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from movielibrary.models.base import Base
@@ -30,3 +33,9 @@ async def db_session(engine):
     async with async_session() as session:
         yield session
         await session.rollback()
+
+
+@pytest.fixture(autouse=True)
+def init_cache():
+    FastAPICache.init(InMemoryBackend(), prefix="test-cache")
+    yield
