@@ -1,5 +1,6 @@
 from sqlalchemy import select
 
+from movielibrary.auth_utils import get_password_hash
 from movielibrary.models import Country, Film, FilmCountry, FilmGenre, Genre, User
 
 
@@ -107,3 +108,46 @@ async def create_film_with_relations(
     await db_session.commit()
     await db_session.refresh(film)
     return film
+
+
+async def login_user(
+    client,
+    db_session,
+    email: str = "alice@example.com",
+    password: str = "secret123",
+):
+    from sqlalchemy import select
+
+    result = await db_session.execute(select(User).where(User.email == email))
+    user = result.scalar_one_or_none()
+
+    if user is None:
+        user = create_user(
+            email=email,
+            password_hash=get_password_hash(password),
+        )
+        db_session.add(user)
+        await db_session.commit()
+    else:
+        user.password_hash = get_password_hash(password)
+        await db_session.commit()
+
+    form_response = await client.get("/login")
+    csrf_token = form_response.cookies["csrf_token"]
+    client.cookies.set("csrf_token", csrf_token)
+
+    response = await client.post(
+        "/login",
+        data={
+            "email": email,
+            "password": password,
+            "csrf_token": csrf_token,
+        },
+        follow_redirects=False,
+    )
+    assert response.status_code == 302
+
+    if "access_token" in response.cookies:
+        client.cookies.set("access_token", response.cookies["access_token"])
+
+    return user
