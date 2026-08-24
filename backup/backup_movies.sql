@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict sE6qWRxllgsOMPtfWviKyObiYVgLXxact19yGQBztNyWaMkTmYJCVV4AITM5WUh
+\restrict bqOUG9YIjKlYBqJo9PafhR2MMdQjSaCjbyoUZJYRLgebzy6bC8h3gO5bQ0SzvJH
 
 -- Dumped from database version 18.2 (Debian 18.2-1.pgdg13+1)
 -- Dumped by pg_dump version 18.2 (Debian 18.2-1.pgdg13+1)
@@ -760,6 +760,10 @@ COPY public.film_country (film_id, country_id) FROM stdin;
 321	11
 321	17
 321	18
+322	1
+322	2
+322	18
+323	1
 \.
 
 
@@ -1153,6 +1157,10 @@ COPY public.film_genre (film_id, genre_id) FROM stdin;
 320	1
 320	9
 321	7
+322	4
+323	1
+323	2
+323	10
 \.
 
 
@@ -1446,6 +1454,8 @@ COPY public.films (id, title, year, description, rating, photo, type) FROM stdin
 318	Как взломать экзамен	2024	Частная школа в центре Лос-Анджелеса, куда каждое утро выстраивается караван представительских машин. Здесь учатся дети элиты: банкиров, политиков, кинозвезд. Bce их проблемы давно решены родителями. За исключением одной — надо сдать финальный экзамен. Для этого им нужен кто-то, кому повезло чуть меньше. Кто-то чертовски умный и готовый на все ради места под солнцем. Новая ученица из бедной семьи как раз из таких. Вот только у злого гения на заказчиков свои планы.	7.4	BadGenius.webp	movie
 320	Дневной свет	2013	Успешный адвокат Ирис узнает, что её мать всю жизнь скрывала от неё один большой секрет. Оказывается, у неё есть старший брат, о существовании которого она даже не подозревала. Рэй, страдающий аутизмом, много лет назад был осужден за жестокое убийство, и теперь находится в судебно-психиатрической клинике. Проникнувшись сочувствием к своему брату, Ирис решает ему помочь, но в поисках истины ей придется столкнуться с такими препятствиями, которые изменят её жизнь навсегда.	6.8	Daglicht.webp	movie
 321	Ультиматум Борна	2007	Джейсон Борн хотел лишь одного — исчезнуть и попытаться жить нормальной жизнью. Но высшие чины ЦРУ стремятся замести следы своих грязных дел, и охота за Борном продолжается. После побега из России, пытаясь выяснить детали своего прошлого, Джейсон выходит на след британского журналиста, получившего от источника в ЦРУ данные о тайном спецпроекте, который связан непосредственно с ним.	7.7	TheBourneUltimatum.jpg	movie
+322	Последний дом	2026	Сиэтл. Обычным дождливым утром семья из четырёх человек собирается за ёлкой и внезапно обнаруживает, что не может выйти из дома: двери не открываются, окна разбить невозможно. Похоже, подобная участь постигла не только соседей, но и весь мир, а непрекращающийся дождь — не такой уж и обычный. Теперь семейству предстоит выживать в замкнутом пространстве с быстро истощающимися запасами еды.	5.8	TheLastHouse.webp	movie
+323	Максимальное удовольствие гарантировано (Сериал)	2026	Пола — недавно пережившая развод одинокая мать — попадает в паутину из шантажа, убийств и юношеского футбола.	7.2	MaximumPleasureGuaranteed.webp	series
 \.
 
 
@@ -1472,7 +1482,7 @@ COPY public.genres (id, name) FROM stdin;
 --
 
 COPY public.users (id, email, password_hash, created_at, last_login) FROM stdin;
-11	spacepythonworld@gmail.com	$argon2id$v=19$m=65536,t=3,p=4$Vg9WFk2PLQ+WbE+ft2TYug$4itM1AhHaP6GqAbclriCmwrzhVTdMWXfPJTg/xA/v3A	2026-08-02 09:51:43.392681	2026-08-15 04:31:19.395135
+11	spacepythonworld@gmail.com	$argon2id$v=19$m=65536,t=3,p=4$Vg9WFk2PLQ+WbE+ft2TYug$4itM1AhHaP6GqAbclriCmwrzhVTdMWXfPJTg/xA/v3A	2026-08-02 09:51:43.392681	2026-08-22 13:35:45.312611
 12	zainka1808@mail.ru	$argon2id$v=19$m=65536,t=3,p=4$UuzzxaZKDpb3BgFxcFXsfA$KdX1vKJeaAyYbM/tjJVYObzPeXrGvMRma9I9yHUEIzg	2026-08-02 09:54:31.769708	\N
 \.
 
@@ -1488,7 +1498,7 @@ SELECT pg_catalog.setval('public.countries_id_seq', 39, true);
 -- Name: films_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.films_id_seq', 321, true);
+SELECT pg_catalog.setval('public.films_id_seq', 323, true);
 
 
 --
@@ -1628,5 +1638,5 @@ ALTER TABLE ONLY public.film_genre
 -- PostgreSQL database dump complete
 --
 
-\unrestrict sE6qWRxllgsOMPtfWviKyObiYVgLXxact19yGQBztNyWaMkTmYJCVV4AITM5WUh
+\unrestrict bqOUG9YIjKlYBqJo9PafhR2MMdQjSaCjbyoUZJYRLgebzy6bC8h3gO5bQ0SzvJH
 
