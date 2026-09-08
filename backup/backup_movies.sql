@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict bqOUG9YIjKlYBqJo9PafhR2MMdQjSaCjbyoUZJYRLgebzy6bC8h3gO5bQ0SzvJH
+\restrict pmyDtN4h7G8dscoRgioCZ9gbNCQynjGadc0tzg6onWpedmxwTCXLJzKmcQBBceP
 
 -- Dumped from database version 18.2 (Debian 18.2-1.pgdg13+1)
 -- Dumped by pg_dump version 18.2 (Debian 18.2-1.pgdg13+1)
@@ -764,6 +764,7 @@ COPY public.film_country (film_id, country_id) FROM stdin;
 322	2
 322	18
 323	1
+324	1
 \.
 
 
@@ -1161,6 +1162,7 @@ COPY public.film_genre (film_id, genre_id) FROM stdin;
 323	1
 323	2
 323	10
+324	1
 \.
 
 
@@ -1456,6 +1458,7 @@ COPY public.films (id, title, year, description, rating, photo, type) FROM stdin
 321	Ультиматум Борна	2007	Джейсон Борн хотел лишь одного — исчезнуть и попытаться жить нормальной жизнью. Но высшие чины ЦРУ стремятся замести следы своих грязных дел, и охота за Борном продолжается. После побега из России, пытаясь выяснить детали своего прошлого, Джейсон выходит на след британского журналиста, получившего от источника в ЦРУ данные о тайном спецпроекте, который связан непосредственно с ним.	7.7	TheBourneUltimatum.jpg	movie
 322	Последний дом	2026	Сиэтл. Обычным дождливым утром семья из четырёх человек собирается за ёлкой и внезапно обнаруживает, что не может выйти из дома: двери не открываются, окна разбить невозможно. Похоже, подобная участь постигла не только соседей, но и весь мир, а непрекращающийся дождь — не такой уж и обычный. Теперь семейству предстоит выживать в замкнутом пространстве с быстро истощающимися запасами еды.	5.8	TheLastHouse.webp	movie
 323	Максимальное удовольствие гарантировано (Сериал)	2026	Пола — недавно пережившая развод одинокая мать — попадает в паутину из шантажа, убийств и юношеского футбола.	7.2	MaximumPleasureGuaranteed.webp	series
+324	Тебе не убежать	2024	Юная Миранда пережила страшную трагедию в прошлом, и вот в ее жизнь врывается новый кошмар: девушка становится мишенью безжалостного серийного убийцы. Чтобы спастись, ей приходится скрываться в мрачном лесу, но преследователь не отстает от нее ни на шаг.	6	YouCan'tRunForever.webp	movie
 \.
 
 
@@ -1482,7 +1485,7 @@ COPY public.genres (id, name) FROM stdin;
 --
 
 COPY public.users (id, email, password_hash, created_at, last_login) FROM stdin;
-11	spacepythonworld@gmail.com	$argon2id$v=19$m=65536,t=3,p=4$Vg9WFk2PLQ+WbE+ft2TYug$4itM1AhHaP6GqAbclriCmwrzhVTdMWXfPJTg/xA/v3A	2026-08-02 09:51:43.392681	2026-08-22 13:35:45.312611
+11	spacepythonworld@gmail.com	$argon2id$v=19$m=65536,t=3,p=4$Vg9WFk2PLQ+WbE+ft2TYug$4itM1AhHaP6GqAbclriCmwrzhVTdMWXfPJTg/xA/v3A	2026-08-02 09:51:43.392681	2026-08-31 10:36:21.302581
 12	zainka1808@mail.ru	$argon2id$v=19$m=65536,t=3,p=4$UuzzxaZKDpb3BgFxcFXsfA$KdX1vKJeaAyYbM/tjJVYObzPeXrGvMRma9I9yHUEIzg	2026-08-02 09:54:31.769708	\N
 \.
 
@@ -1498,7 +1501,7 @@ SELECT pg_catalog.setval('public.countries_id_seq', 39, true);
 -- Name: films_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.films_id_seq', 323, true);
+SELECT pg_catalog.setval('public.films_id_seq', 324, true);
 
 
 --
@@ -1638,5 +1641,5 @@ ALTER TABLE ONLY public.film_genre
 -- PostgreSQL database dump complete
 --
 
-\unrestrict bqOUG9YIjKlYBqJo9PafhR2MMdQjSaCjbyoUZJYRLgebzy6bC8h3gO5bQ0SzvJH
+\unrestrict pmyDtN4h7G8dscoRgioCZ9gbNCQynjGadc0tzg6onWpedmxwTCXLJzKmcQBBceP
 
