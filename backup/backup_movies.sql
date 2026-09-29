@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict pmyDtN4h7G8dscoRgioCZ9gbNCQynjGadc0tzg6onWpedmxwTCXLJzKmcQBBceP
+\restrict Bcot8HQHWp7wjXQRs30vhOdvnIrnSFeBp5VYQcGIAYLGAqeNSL3cXd35t6Q3ksf
 
 -- Dumped from database version 18.2 (Debian 18.2-1.pgdg13+1)
 -- Dumped by pg_dump version 18.2 (Debian 18.2-1.pgdg13+1)
@@ -765,6 +765,7 @@ COPY public.film_country (film_id, country_id) FROM stdin;
 322	18
 323	1
 324	1
+325	1
 \.
 
 
@@ -1163,6 +1164,9 @@ COPY public.film_genre (film_id, genre_id) FROM stdin;
 323	2
 323	10
 324	1
+325	1
+325	9
+325	10
 \.
 
 
@@ -1459,6 +1463,7 @@ COPY public.films (id, title, year, description, rating, photo, type) FROM stdin
 322	Последний дом	2026	Сиэтл. Обычным дождливым утром семья из четырёх человек собирается за ёлкой и внезапно обнаруживает, что не может выйти из дома: двери не открываются, окна разбить невозможно. Похоже, подобная участь постигла не только соседей, но и весь мир, а непрекращающийся дождь — не такой уж и обычный. Теперь семейству предстоит выживать в замкнутом пространстве с быстро истощающимися запасами еды.	5.8	TheLastHouse.webp	movie
 323	Максимальное удовольствие гарантировано (Сериал)	2026	Пола — недавно пережившая развод одинокая мать — попадает в паутину из шантажа, убийств и юношеского футбола.	7.2	MaximumPleasureGuaranteed.webp	series
 324	Тебе не убежать	2024	Юная Миранда пережила страшную трагедию в прошлом, и вот в ее жизнь врывается новый кошмар: девушка становится мишенью безжалостного серийного убийцы. Чтобы спастись, ей приходится скрываться в мрачном лесу, но преследователь не отстает от нее ни на шаг.	6	YouCan'tRunForever.webp	movie
+325	Его и её (Сериал)	2026	Анна Эндрюс, тележурналистка из Атланты, возвращается в дело спустя год отсутствия. За это время Анна лишилась должности главной ведущей программы новостей, и, чтобы вернуть работу, она вызывается сделать репортаж в своём родном городе Далонеге об убийстве женщины. В родном городе она вновь встречает своего отдалившегося мужа, переехавшего из Атланты детектива Джека Харпера, которому поручено расследование убийства. Супруги относятся друг к другу с подозрением и соревнуются в расследовании дела.	7.4	His&Hers.webp	series
 \.
 
 
@@ -1485,7 +1490,7 @@ COPY public.genres (id, name) FROM stdin;
 --
 
 COPY public.users (id, email, password_hash, created_at, last_login) FROM stdin;
-11	spacepythonworld@gmail.com	$argon2id$v=19$m=65536,t=3,p=4$Vg9WFk2PLQ+WbE+ft2TYug$4itM1AhHaP6GqAbclriCmwrzhVTdMWXfPJTg/xA/v3A	2026-08-02 09:51:43.392681	2026-08-31 10:36:21.302581
+11	spacepythonworld@gmail.com	$argon2id$v=19$m=65536,t=3,p=4$Vg9WFk2PLQ+WbE+ft2TYug$4itM1AhHaP6GqAbclriCmwrzhVTdMWXfPJTg/xA/v3A	2026-08-02 09:51:43.392681	2026-09-21 10:41:12.247965
 12	zainka1808@mail.ru	$argon2id$v=19$m=65536,t=3,p=4$UuzzxaZKDpb3BgFxcFXsfA$KdX1vKJeaAyYbM/tjJVYObzPeXrGvMRma9I9yHUEIzg	2026-08-02 09:54:31.769708	\N
 \.
 
@@ -1501,7 +1506,7 @@ SELECT pg_catalog.setval('public.countries_id_seq', 39, true);
 -- Name: films_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.films_id_seq', 324, true);
+SELECT pg_catalog.setval('public.films_id_seq', 325, true);
 
 
 --
@@ -1641,5 +1646,5 @@ ALTER TABLE ONLY public.film_genre
 -- PostgreSQL database dump complete
 --
 
-\unrestrict pmyDtN4h7G8dscoRgioCZ9gbNCQynjGadc0tzg6onWpedmxwTCXLJzKmcQBBceP
+\unrestrict Bcot8HQHWp7wjXQRs30vhOdvnIrnSFeBp5VYQcGIAYLGAqeNSL3cXd35t6Q3ksf
 
